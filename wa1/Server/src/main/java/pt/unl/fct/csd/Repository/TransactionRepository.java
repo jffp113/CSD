@@ -7,5 +7,4 @@ import pt.unl.fct.csd.Model.Transaction;
 @Repository
 public interface TransactionRepository extends JpaRepository<Transaction, Long> {
 
-
 }

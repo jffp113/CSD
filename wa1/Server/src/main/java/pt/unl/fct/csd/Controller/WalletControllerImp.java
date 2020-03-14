@@ -34,8 +34,8 @@ public class WalletControllerImp implements WalletController {
             throw new InvalidTransactionException();
         }
 
-        UserAccount account = userAccountRepository.findById(transaction.getFrom())
-                .orElse(new UserAccount(transaction.getFrom(),0L));
+        UserAccount account = userAccountRepository.findById(transaction.getTo())
+                .orElse(new UserAccount(transaction.getTo(),0L));
 
         account.addMoney(transaction.getAmount());
 
@@ -59,8 +59,8 @@ public class WalletControllerImp implements WalletController {
             throw new InvalidTransactionException();
         }
 
-        userFrom.setMoney(transaction.getAmount() * -1);
-        userTo.setMoney(transaction.getAmount());
+        userFrom.addMoney(transaction.getAmount() * -1);
+        userTo.addMoney(transaction.getAmount());
 
         userAccountRepository.save(userFrom);
         userAccountRepository.save(userTo);
