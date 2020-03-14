@@ -91,6 +91,6 @@ public class WalletControllerImp implements WalletController {
 
     @Override
     public List<Transaction> ledgerOfClientTransfers(String id) {
-        return transactionRepository.getAllByFromLike(id);
+        return transactionRepository.getByFrom(id);
     }
 }

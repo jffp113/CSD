@@ -61,7 +61,7 @@ public class WalletRelatedCommandsImpl {
         StringBuffer stringBuffer = new StringBuffer();
         stringBuffer.append("Ledger:\n");
 
-        for(Transaction transaction : client.ledgerOfGlobalTransfers()){
+        for(Transaction transaction : transactionsList){
             stringBuffer.append(String.format("Transfer from %s to %s of %d\n",
                     transaction.getFrom(),transaction.getTo(),transaction.getAmount()));
         }
