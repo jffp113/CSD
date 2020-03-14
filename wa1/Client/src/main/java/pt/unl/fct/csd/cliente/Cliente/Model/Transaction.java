@@ -3,6 +3,9 @@ package pt.unl.fct.csd.cliente.Cliente.Model;
 
 public class Transaction {
 
+    public Transaction(){
+
+    }
     public Transaction(String toUser,Long amount){
         this.to = toUser;
         this.amount = amount;

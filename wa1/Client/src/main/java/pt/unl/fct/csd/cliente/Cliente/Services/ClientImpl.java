@@ -11,6 +11,9 @@ import pt.unl.fct.csd.cliente.Cliente.Handlers.RestTemplateResponseErrorHandler;
 import pt.unl.fct.csd.cliente.Cliente.Model.Transaction;
 
 import javax.annotation.PostConstruct;
+import java.lang.reflect.Array;
+import java.util.Arrays;
+import java.util.List;
 
 @Service
 @PropertySource("classpath:application.properties")
@@ -19,11 +22,11 @@ public class ClientImpl implements Client {
     @Value("${client.server.url}")
     private String BASE;
 
-
     private static String WALLET_CONTROLLER =  "/money";
     private static String CREATE_MONEY = WALLET_CONTROLLER + "/create";
     private static String TRANSFER_MONEY = WALLET_CONTROLLER + "/transfer";
     private static String GET_MONEY = WALLET_CONTROLLER + "/current/";
+    private static String GET_LEDGER =WALLET_CONTROLLER + "/ledger/";
 
     private RestTemplate restTemplate;
 
@@ -63,4 +66,20 @@ public class ClientImpl implements Client {
     public Long currentAmount(String userID) {
         return restTemplate.getForEntity(BASE + GET_MONEY + userID, Long.class).getBody();
     }
+
+    @Override
+    public List<Transaction> ledgerOfGlobalTransfers() {
+        return getLedgerFromPath(BASE + GET_LEDGER);
+    }
+
+    @Override
+    public List<Transaction> LedgerOfClientTransfers(String userId) {
+        return getLedgerFromPath(BASE + GET_LEDGER + userId);
+    }
+
+    private List<Transaction> getLedgerFromPath(String path){
+        return Arrays.asList(
+                restTemplate.getForEntity(path, Transaction[].class).getBody());
+    }
+
 }

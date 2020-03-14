@@ -11,6 +11,7 @@ import pt.unl.fct.csd.Model.UserAccount;
 import pt.unl.fct.csd.Repository.TransactionRepository;
 import pt.unl.fct.csd.Repository.UserAccountRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 
@@ -83,4 +84,13 @@ public class WalletControllerImp implements WalletController {
         return user.get();
     }
 
+    @Override
+    public List<Transaction> ledgerOfClientTransfers() {
+        return transactionRepository.findAll();
+    }
+
+    @Override
+    public List<Transaction> ledgerOfClientTransfers(String id) {
+        return transactionRepository.getAllByFromLike(id);
+    }
 }

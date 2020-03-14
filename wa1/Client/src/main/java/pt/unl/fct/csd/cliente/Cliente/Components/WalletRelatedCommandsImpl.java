@@ -4,7 +4,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
 import org.springframework.shell.standard.ShellOption;
+import pt.unl.fct.csd.cliente.Cliente.Model.Transaction;
 import pt.unl.fct.csd.cliente.Cliente.Services.Client;
+
+import java.util.List;
 
 @ShellComponent
 public class WalletRelatedCommandsImpl {
@@ -34,11 +37,36 @@ public class WalletRelatedCommandsImpl {
     }
 
     @ShellMethod("See the provided user money")
-    public String currentAmount(
-            @ShellOption() String id)
-    {
+    public String currentAmount(@ShellOption() String id) {
         //TODO model exceptions
         return "The user has " + client.currentAmount(id);
+    }
+
+
+    @ShellMethod("See the provided user money")
+    public String ledger() {
+        return transformListOfTransactionInString(
+                        client.ledgerOfGlobalTransfers());
+    }
+
+    @ShellMethod("See the provided user money")
+    public String clientLedger(@ShellOption() String id)
+    {
+        return transformListOfTransactionInString(
+                        client.LedgerOfClientTransfers(id));
+    }
+
+
+    public String transformListOfTransactionInString(List<Transaction> transactionsList){
+        StringBuffer stringBuffer = new StringBuffer();
+        stringBuffer.append("Ledger:\n");
+
+        for(Transaction transaction : client.ledgerOfGlobalTransfers()){
+            stringBuffer.append(String.format("Transfer from %s to %s of %d\n",
+                    transaction.getFrom(),transaction.getTo(),transaction.getAmount()));
+        }
+
+        return stringBuffer.toString();
     }
 
 }
