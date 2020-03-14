@@ -35,9 +35,8 @@ public class ClientImpl implements Client {
 
     @Autowired
     public ClientImpl(RestTemplateBuilder restTemplateBuilder,Environment env){
-//        System.setProperty("javax.net.ssl.trustStore", env.getProperty("client.ssl.trust-store"));
-//        System.setProperty("javax.net.ssl.trustStorePassword",env.getProperty("client.ssl.trust-store-password"));
-        //SSLUtil.changeDefaultCertificateValidation();
+        System.setProperty("javax.net.ssl.trustStore", env.getProperty("client.ssl.trust-store"));
+        System.setProperty("javax.net.ssl.trustStorePassword",env.getProperty("client.ssl.trust-store-password"));
         restTemplate = restTemplateBuilder
                 .errorHandler(new RestTemplateResponseErrorHandler())
                 .build();
