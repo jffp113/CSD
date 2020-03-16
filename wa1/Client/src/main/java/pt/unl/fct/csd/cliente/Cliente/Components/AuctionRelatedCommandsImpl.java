@@ -63,7 +63,7 @@ public class AuctionRelatedCommandsImpl {
     }
 
     @ShellMethod("Lists the closed auctions in the system")
-    public String clientLedger(@ShellOption() String id) {
+    public String getClosedAuctions(@ShellOption() String id) {
     	List<Auction> auctions = client.getClosedAuctions();
     	return listAuctions(auctions);
     }
