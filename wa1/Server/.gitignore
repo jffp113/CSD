@@ -1,5 +1,9 @@
 /target/
+# IntelliJ
+.idea
+*iml
+# Eclipse
+.classpath
 .project
 .settings
-.classpath
 *.log

@@ -7,7 +7,7 @@ import pt.unl.fct.csd.cliente.Cliente.Model.Bid;
 
 public interface AuctionClient {
 
-	void createAuction(String clientId);
+	void createAuction(String ownerId);
 	
 	void terminateAuction(long auctionId);
 	

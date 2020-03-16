@@ -25,7 +25,7 @@ public interface AuctionController {
     @PostMapping(
             value = CREATE_AUCTION,
             consumes = APPLICATION_JSON_VALUE)
-    void createAuction(@RequestBody Auction auction);
+    void createAuction(@RequestBody String ownerId);
  
     @PutMapping(
             value = TERMINATE_AUCTION)
