@@ -10,4 +10,8 @@ import java.util.List;
 
 @Repository
 public interface BidRepository extends JpaRepository<Bid, String> {
+	
+	List<Bid> getAllByAuctionId(long auctionId);
+	
+	List<Bid> getAllByBidderId(String bidderId);
 }

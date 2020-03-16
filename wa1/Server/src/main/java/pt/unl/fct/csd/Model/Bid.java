@@ -20,9 +20,6 @@ public class Bid {
 	
 	@Column(name = "auctionId", nullable = false)
 	private String auctionId;
-	
-	@Column(name = "isClosed", nullable = false)
-	private Boolean isClosed;
 
 	@Column(name = "value", nullable = false)
 	private int value;
@@ -33,14 +30,6 @@ public class Bid {
 
 	public void setAuctionId(String auctionId) {
 		this.auctionId = auctionId;
-	}
-
-	public Boolean getIsClosed() {
-		return isClosed;
-	}
-
-	public void setIsClosed(Boolean isClosed) {
-		this.isClosed = isClosed;
 	}
 
 	public Long getId() {

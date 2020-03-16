@@ -1,7 +1,5 @@
 package pt.unl.fct.csd.Model;
 
-import java.util.List;
-
 import javax.persistence.*;
 
 @Entity
@@ -15,8 +13,11 @@ public class Auction {
 	@Column(name = "ownerId", nullable = false)
 	private String ownerId;
 
-	@Column(name = "bids", nullable = false)
-	private List<String> bids;
+	@Column(name = "closingBidId", nullable = true)
+	private String lastBidId;
+	
+	@Column(name = "isClosed", nullable = false)
+	private boolean isClosed = false;
 
 	public Long getId() {
 		return id;
@@ -34,11 +35,27 @@ public class Auction {
 		this.ownerId = ownerId;
 	}
 
-	public List<String> getBidIds() {
-		return bids;
+	public String getLastBid() {
+		return lastBidId;
 	}
 
-	public void setBids(List<String> bids) {
-		this.bids = bids;
+	/**
+	 * returns true if the lastAuction is changed 
+	 * and false if it couldn't be because the auction was closed
+	 */
+	public boolean setlastBid(String lastBidId) {
+		if (!isClosed) {
+			this.lastBidId = lastBidId;
+			return true;
+		}
+		return false;
+	}
+	
+	public boolean isAuctionClosed() {
+		return isClosed;
+	}
+	
+	public void closeAuction() {
+		this.isClosed = true;
 	}
 }

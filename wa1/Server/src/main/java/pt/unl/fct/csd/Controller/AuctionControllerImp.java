@@ -36,45 +36,48 @@ public class AuctionControllerImp implements AuctionController {
 
 	@Override
 	public void createAuction(Auction auction) {
-		// TODO Auto-generated method stub
+		if (userAccountRepository.existsById(auction.getOwnerId())) {
+			throw new AccountDoesNotExistException();
+		}
+
+		auction.setOwnerId(null); //TODO LETS CHANGE THIS LATER
+		auctionRepository.save(auction);
 	}
 
 	@Override
-	public void terminateAuction(String id) {
-		// TODO Auto-generated method stub
-		
+	public void terminateAuction(long auctionId) {
+		Auction auction = auctionRepository.findById(auctionId).
+			orElseThrow(() -> new AccountDoesNotExistException());
+		auction.closeAuction();
 	}
 
 	@Override
-	public List<Auction> getOpenAuctions(String id) {
-		// TODO Auto-generated method stub
-		return null;
+	public List<Auction> getOpenAuctions() {
+		return auctionRepository.getAllByIsOpenTrue();
 	}
 
 	@Override
-	public List<Auction> getClosedAuction(String id) {
-		// TODO Auto-generated method stub
-		return null;
+	public List<Auction> getClosedAuction() {
+		return auctionRepository.getAllByIsOpenFalse();
 	}
 
 	@Override
-	public List<Bid> getAuctionBids(String id) {
-		// TODO Auto-generated method stub
-		return null;
+	public List<Bid> getAuctionBids(long auctionId) {
+		return bidRepository.getAllByAuctionId(auctionId);
 	}
 
 	@Override
 	public List<Bid> getClientBids(String clientId) {
-		// TODO Auto-generated method stub
-		return null;
+		return bidRepository.getAllByBidderId(clientId);
 	}
 
 	@Override
-	public Bid getCloseBid(String id) {
-		// TODO Auto-generated method stub
-		return null;
+	public Bid getCloseBid(long auctionId) {
+		Auction auction = auctionRepository.findById(auctionId).
+				orElseThrow(() -> new AccountDoesNotExistException());
+		String bidId = auction.getLastBid();
+		return bidRepository.findById(bidId).
+				orElseThrow(() -> new AccountDoesNotExistException());
 	}
-
-	
 
 }

@@ -8,4 +8,5 @@ import pt.unl.fct.csd.Model.UserAccount;
 public interface UserAccountRepository extends JpaRepository<UserAccount,String> {
 
     UserAccount getUserAccountById(String s);
+
 }
