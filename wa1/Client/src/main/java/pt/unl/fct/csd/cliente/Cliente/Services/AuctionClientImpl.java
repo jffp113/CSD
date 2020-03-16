@@ -35,11 +35,11 @@ public class AuctionClientImpl implements AuctionClient {
     	GET_AUCTION_BIDS("/%d/bids"),
     	GET_CLIENT_BIDS("/client/%s");
     	
-    	private static final String BASE_URL = "/auction";
+    	private static final String BASE_URL = "/auctions";
     	private final String url;
     	
     	private Path(String url) {
-    		this.url = BASE_URL + url;
+    		this.url = "%s" + BASE_URL + url;
     	}
     }
     
@@ -66,52 +66,58 @@ public class AuctionClientImpl implements AuctionClient {
 
 	@Override
 	public void createAuction(String ownerId) {
-		String urlWithId = String.format(Path.CREATE_AUCTION.url, ownerId);
+		String urlWithId = String.format(Path.CREATE_AUCTION.url, BASE, ownerId);
+		System.out.println(urlWithId);
 		restTemplate.postForEntity(urlWithId, null, Void.class);
 	}
 
 	@Override
 	public void terminateAuction(long auctionId) {
-		String urlWithId = String.format(Path.TERMINATE_AUCTION.url, auctionId);
+		String urlWithId = String.format(Path.TERMINATE_AUCTION.url, BASE, auctionId);
 		restTemplate.put(urlWithId, null); //TODO CHANGE TO GOOD
 	}
 
 	@Override
 	public List<Auction> getOpenAuctions() {
+		String urlComplete = String.format(Path.GET_OPEN_AUCTIONS.url, BASE);
 		Auction[] auctions = restTemplate.
-				getForEntity(Path.GET_OPEN_AUCTIONS.url, Auction[].class).
+				getForEntity(urlComplete, Auction[].class).
 				getBody();
 		return Arrays.asList(auctions);
 	}
 
 	@Override
 	public List<Auction> getClosedAuctions() {
+		String urlComplete = String.format(Path.GET_CLOSED_AUCTIONS.url, BASE);
 		Auction[] auctions = restTemplate.
-				getForEntity(Path.GET_CLOSED_AUCTIONS.url, Auction[].class).
+				getForEntity(urlComplete, Auction[].class).
 				getBody();
 		return Arrays.asList(auctions);
 	}
 
 	@Override
 	public List<Bid> getAuctionBids(long auctionId) {
+		String urlComplete = String.format(Path.GET_AUCTION_BIDS.url, BASE);
 		Bid[] bids = restTemplate.
-				getForEntity(Path.GET_AUCTION_BIDS.url, Bid[].class).
+				getForEntity(urlComplete, Bid[].class).
 				getBody();
 		return Arrays.asList(bids);
 	}
 
 	@Override
 	public List<Bid> getClientBids(String clientId) {
+		String urlComplete = String.format(Path.GET_CLIENT_BIDS.url, BASE);
 		Bid[] bids = restTemplate.
-				getForEntity(Path.GET_CLIENT_BIDS.url, Bid[].class).
+				getForEntity(urlComplete, Bid[].class).
 				getBody();
 		return Arrays.asList(bids);
 	}
 
 	@Override
-	public Bid getClosedBid(long Auction) {
+	public Bid getClosedBid(long auctionId) {
+		String urlWithId = String.format(Path.GET_CLOSE_BID.url, BASE, auctionId);
 		return restTemplate.
-				getForEntity(Path.GET_CLOSE_BID.url, Bid.class).
+				getForEntity(urlWithId, Bid.class).
 				getBody();
 	}
 
