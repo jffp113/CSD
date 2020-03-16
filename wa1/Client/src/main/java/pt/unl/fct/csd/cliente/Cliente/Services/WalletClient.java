@@ -5,7 +5,7 @@ import pt.unl.fct.csd.cliente.Cliente.Model.Transaction;
 
 import java.util.List;
 
-public interface Client {
+public interface WalletClient {
 
     void createMoney(String toUser, Long amount);
 

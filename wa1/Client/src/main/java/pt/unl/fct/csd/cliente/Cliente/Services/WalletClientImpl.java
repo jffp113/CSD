@@ -11,13 +11,12 @@ import pt.unl.fct.csd.cliente.Cliente.Handlers.RestTemplateResponseErrorHandler;
 import pt.unl.fct.csd.cliente.Cliente.Model.Transaction;
 
 import javax.annotation.PostConstruct;
-import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.List;
 
 @Service
 @PropertySource("classpath:application.properties")
-public class ClientImpl implements Client {
+public class WalletClientImpl implements WalletClient {
 
     @Value("${client.server.url}")
     private String BASE;
@@ -37,7 +36,7 @@ public class ClientImpl implements Client {
     }
 
     @Autowired
-    public ClientImpl(RestTemplateBuilder restTemplateBuilder,Environment env){
+    public WalletClientImpl(RestTemplateBuilder restTemplateBuilder,Environment env){
         System.setProperty("javax.net.ssl.trustStore", env.getProperty("client.ssl.trust-store"));
         System.setProperty("javax.net.ssl.trustStorePassword",env.getProperty("client.ssl.trust-store-password"));
         restTemplate = restTemplateBuilder
@@ -46,9 +45,7 @@ public class ClientImpl implements Client {
     }
 
     @PostConstruct
-    public void init() {
-
-    }
+    public void init() {}
 
     @Override
     public void createMoney(String toUser, Long amount) {
