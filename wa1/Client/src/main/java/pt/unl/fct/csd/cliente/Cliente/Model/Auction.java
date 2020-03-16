@@ -8,10 +8,9 @@ public class Auction {
 
 	private String lastBidId;
 	
-	private boolean isClosed = false;
+	private boolean isClosed;
 	
-	public Auction (String ownerId) {
-		this.ownerId = ownerId;
+	public Auction () {
 	}
 
 	public Long getId() {

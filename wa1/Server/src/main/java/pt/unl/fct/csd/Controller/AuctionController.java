@@ -14,7 +14,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 public interface AuctionController {
 
     String BASE_URL = "/auctions";
-    String CREATE_AUCTION = "/create";
+    String CREATE_AUCTION = "/create/{ownerId}";
     String TERMINATE_AUCTION = "/terminate/{auctionId}";
     String GET_CLOSE_BID = "/{auctionId}/closebid";	
     String GET_OPEN_AUCTIONS = "/open";
@@ -22,13 +22,10 @@ public interface AuctionController {
     String GET_AUCTION_BIDS = "/{auctionId}/bids";
     String GET_CLIENT_BIDS = "/client/{clientId}";
     
-    @PostMapping(
-            value = CREATE_AUCTION,
-            consumes = APPLICATION_JSON_VALUE)
-    void createAuction(@RequestBody String ownerId);
+    @PostMapping(value = CREATE_AUCTION)
+    void createAuction(@PathVariable("ownerId") String ownerId);
  
-    @PutMapping(
-            value = TERMINATE_AUCTION)
+    @PutMapping(value = TERMINATE_AUCTION)
     void terminateAuction(@PathVariable("auctionId") long auctionId);
    
     @GetMapping(

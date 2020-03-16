@@ -34,7 +34,8 @@ public class AuctionControllerImp implements AuctionController {
 			throw new AccountDoesNotExistException();
 		}
 
-		Auction auction = new Auction(ownerId);
+		Auction auction = new Auction();
+		auction.setOwner(ownerId);
 		auctionRepository.save(auction);
 	}
 

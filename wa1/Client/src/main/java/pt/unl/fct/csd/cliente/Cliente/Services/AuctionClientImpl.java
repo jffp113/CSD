@@ -67,7 +67,6 @@ public class AuctionClientImpl implements AuctionClient {
 	@Override
 	public void createAuction(String ownerId) {
 		String urlWithId = String.format(Path.CREATE_AUCTION.url, BASE, ownerId);
-		System.out.println(urlWithId);
 		restTemplate.postForEntity(urlWithId, null, Void.class);
 	}
 

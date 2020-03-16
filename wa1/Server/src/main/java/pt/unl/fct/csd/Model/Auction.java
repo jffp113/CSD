@@ -11,7 +11,7 @@ public class Auction {
 	private Long id;
 
 	@Column(name = "ownerId", nullable = false)
-	private final String ownerId;
+	private String ownerId;
 
 	@Column(name = "closingBidId", nullable = true)
 	private String lastBidId;
@@ -19,9 +19,7 @@ public class Auction {
 	@Column(name = "isClosed", nullable = false)
 	private boolean isClosed = false;
 
-	public Auction(String ownerId) {
-		this.ownerId = ownerId;
-	}
+	public Auction() {}
 	
 	public Long getId() {
 		return id;
@@ -29,6 +27,10 @@ public class Auction {
 
 	public void setId(Long id) {
 		this.id = id;
+	}
+	
+	public void setOwner(String ownerId) {
+		this.ownerId = ownerId;
 	}
 
 	public String getOwnerId() {

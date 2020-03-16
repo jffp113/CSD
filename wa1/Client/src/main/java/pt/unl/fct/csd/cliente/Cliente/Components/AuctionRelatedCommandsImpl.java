@@ -72,8 +72,8 @@ public class AuctionRelatedCommandsImpl {
     	StringBuffer stringBuffer = new StringBuffer();
         stringBuffer.append("Auction Bids:\n");
         for (Auction auction : auctions) {
-        	String toPrint = String.format("An auction from %s\n", 
-        			auction.getOwnerId());
+        	String toPrint = String.format("An auction with id %d from %s\n", 
+        			auction.getId(), auction.getOwnerId());
         	stringBuffer.append(toPrint);
         }
         return stringBuffer.toString();
