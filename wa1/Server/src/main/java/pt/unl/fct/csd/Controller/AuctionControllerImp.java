@@ -53,12 +53,12 @@ public class AuctionControllerImp implements AuctionController {
 
 	@Override
 	public List<Auction> getOpenAuctions() {
-		return auctionRepository.getAllByIsOpenTrue();
+		return auctionRepository.getAllByIsClosedFalse();
 	}
 
 	@Override
 	public List<Auction> getClosedAuction() {
-		return auctionRepository.getAllByIsOpenFalse();
+		return auctionRepository.getAllByIsClosedTrue();
 	}
 
 	@Override

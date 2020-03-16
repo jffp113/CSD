@@ -9,9 +9,9 @@ import java.util.List;
 
 @Repository
 public interface AuctionRepository extends JpaRepository<Auction, Long> {
-	List<Auction> getAllByIsOpenTrue();
+	List<Auction> getAllByIsClosedFalse();
 	
-	List<Auction> getAllByIsOpenFalse();
+	List<Auction> getAllByIsClosedTrue();
 	
 	
 }
