@@ -5,7 +5,7 @@ import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
 import org.springframework.shell.standard.ShellOption;
 import pt.unl.fct.csd.cliente.Cliente.Model.Transaction;
-import pt.unl.fct.csd.cliente.Cliente.Services.Client;
+import pt.unl.fct.csd.cliente.Cliente.Services.WalletClient;
 
 import java.util.List;
 
@@ -13,10 +13,10 @@ import java.util.List;
 public class WalletRelatedCommandsImpl {
     //TODO improvement include a Terminal class with colors
 
-    private Client client;
+    private WalletClient client;
 
     @Autowired
-    public WalletRelatedCommandsImpl(Client client) {
+    public WalletRelatedCommandsImpl(WalletClient client) {
         this.client = client;
     }
 
