@@ -105,7 +105,7 @@ public class AuctionClientImpl implements AuctionClient {
 
 	@Override
 	public List<Bid> getClientBids(String clientId) {
-		String urlComplete = String.format(Path.GET_CLIENT_BIDS.url, BASE);
+		String urlComplete = String.format(Path.GET_CLIENT_BIDS.url, BASE, clientId);
 		Bid[] bids = restTemplate.
 				getForEntity(urlComplete, Bid[].class).
 				getBody();

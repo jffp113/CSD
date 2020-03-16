@@ -63,14 +63,14 @@ public class AuctionRelatedCommandsImpl {
     }
 
     @ShellMethod("Lists the closed auctions in the system")
-    public String getClosedAuctions(@ShellOption() String id) {
+    public String getClosedAuctions() {
     	List<Auction> auctions = client.getClosedAuctions();
     	return listAuctions(auctions);
     }
     
     private String listAuctions(List<Auction> auctions) {
     	StringBuffer stringBuffer = new StringBuffer();
-        stringBuffer.append("Auction Bids:\n");
+        stringBuffer.append("Auctions:\n");
         for (Auction auction : auctions) {
         	String toPrint = String.format("An auction with id %d from %s\n", 
         			auction.getId(), auction.getOwnerId());
