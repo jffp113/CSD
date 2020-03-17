@@ -30,7 +30,7 @@ public class AuctionControllerImp implements AuctionController {
 
 	@Override
 	public void createAuction(String ownerId) {
-		if (userAccountRepository.existsById(ownerId)) {
+		if (!userAccountRepository.existsById(ownerId)) {
 			throw new AccountDoesNotExistException();
 		}
 
@@ -42,18 +42,19 @@ public class AuctionControllerImp implements AuctionController {
 	@Override
 	public void terminateAuction(long auctionId) {
 		Auction auction = auctionRepository.findById(auctionId).
-			orElseThrow(() -> new AccountDoesNotExistException());
+			orElseThrow(AccountDoesNotExistException::new);
 		auction.closeAuction();
+		auctionRepository.save(auction);
 	}
 
 	@Override
 	public List<Auction> getOpenAuctions() {
-		return auctionRepository.getAllByIsClosedFalse();
+		return auctionRepository.getAllByisClosedFalse();
 	}
 
 	@Override
 	public List<Auction> getClosedAuction() {
-		return auctionRepository.getAllByIsClosedTrue();
+		return auctionRepository.getAllByisClosedTrue();
 	}
 
 	@Override
@@ -69,10 +70,10 @@ public class AuctionControllerImp implements AuctionController {
 	@Override
 	public Bid getCloseBid(long auctionId) {
 		Auction auction = auctionRepository.findById(auctionId).
-				orElseThrow(() -> new AccountDoesNotExistException());
+				orElseThrow(AccountDoesNotExistException::new);
 		String bidId = auction.getLastBid();
 		return bidRepository.findById(bidId).
-				orElseThrow(() -> new AccountDoesNotExistException());
+				orElseThrow(AccountDoesNotExistException::new);
 	}
 
 }

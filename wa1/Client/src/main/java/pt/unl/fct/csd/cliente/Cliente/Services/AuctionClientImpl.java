@@ -38,7 +38,7 @@ public class AuctionClientImpl implements AuctionClient {
     	private static final String BASE_URL = "/auctions";
     	private final String url;
     	
-    	private Path(String url) {
+    	Path(String url) {
     		this.url = "%s" + BASE_URL + url;
     	}
     }
