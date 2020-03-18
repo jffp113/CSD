@@ -6,15 +6,21 @@ public class Bid {
 
 	private String bidderId;
 	
-	private String auctionId;
+	private Long auctionId;
 
 	private int value;
 
-	public String getAuctionId() {
+	public Bid(String bidderId, Long auctionId, int value){
+		this.bidderId = bidderId;
+		this.auctionId = auctionId;
+		this.value = value;
+	}
+
+	public Long getAuctionId() {
 		return auctionId;
 	}
 
-	public void setAuctionId(String auctionId) {
+	public void setAuctionId(Long auctionId) {
 		this.auctionId = auctionId;
 	}
 

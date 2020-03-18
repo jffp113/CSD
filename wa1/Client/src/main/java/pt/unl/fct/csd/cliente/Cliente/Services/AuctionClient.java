@@ -20,4 +20,6 @@ public interface AuctionClient {
 	List<Bid> getClientBids(String clientId);
 	
 	Bid getClosedBid(long Auction);
+
+	void createBid(String bidderId, Long auctionId, int value);
 }

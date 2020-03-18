@@ -91,4 +91,10 @@ public class AuctionRelatedCommandsImpl {
         return "Auction was by the bid: " + bid.getAuctionId();
     }
 
+    @ShellMethod("Create a bid in a specified auction with a determinated amount from a certrain user")
+    public String createBid(@ShellOption() String bidderId, @ShellOption() Long auctionId, @ShellOption() int value){
+        client.createBid(bidderId, auctionId, value);
+        return "Bid Created";
+    }
+
 }

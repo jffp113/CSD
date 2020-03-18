@@ -28,6 +28,7 @@ public class AuctionClientImpl implements AuctionClient {
     //CONSTANTES
     private enum Path {
     	CREATE_AUCTION("/create/%s"),
+    	CREATE_BID("/create/bid"),
     	TERMINATE_AUCTION("/terminate/%s"),
     	GET_CLOSE_BID("/%d/closebid"),
     	GET_OPEN_AUCTIONS("/open"),
@@ -120,4 +121,9 @@ public class AuctionClientImpl implements AuctionClient {
 				getBody();
 	}
 
+	@Override
+	public void createBid(String bidderId, Long auctionId, int value) {
+		Bid bid = new Bid(bidderId, auctionId, value);
+		restTemplate.postForEntity(Path.CREATE_BID.url,bid,Void.class);
+	}
 }
