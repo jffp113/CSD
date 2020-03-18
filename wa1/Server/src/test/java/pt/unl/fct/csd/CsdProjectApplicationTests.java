@@ -54,24 +54,25 @@ class CsdProjectApplicationTests {
         //create users, create money, checks amount
         performCreateMoney(new Transaction(username1, amount))
                 .andExpect(status().isOk());
-        assertThat(userRepository.getUserAccountById(username1).getMoney().equals(amount));
+
+        assertThat(userRepository.findById(username1).get().getMoney().equals(amount));
 
         performGetCurrentAmount(username1)
                 .andExpect(status().isOk()).andExpect(content().json(Long.toString(amount)));
 
         performCreateMoney(new Transaction(username2, amount))
                 .andExpect(status().isOk());
-        assertThat(userRepository.getUserAccountById(username2).getMoney().equals(amount));
+        assertThat(userRepository.findById(username2).get().getMoney().equals(amount));
 
         //just create money and give it to user1
         performCreateMoney(new Transaction(username1, amount))
                 .andExpect(status().isOk());
-        assertThat(userRepository.getUserAccountById(username1).getMoney() == amount * 2);
+        assertThat(userRepository.findById(username1).get().getMoney() == amount * 2);
 
         //tries to "destroy" money
         performCreateMoney(new Transaction(username1, amount * -1))
                 .andExpect(status().isBadRequest());
-        assertThat(!userRepository.getUserAccountById(username1).getMoney().equals(amount));
+        assertThat(!userRepository.findById(username1).get().getMoney().equals(amount));
 
         //final amount check
         performGetCurrentAmount(username1)
