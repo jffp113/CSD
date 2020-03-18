@@ -4,8 +4,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
-import pt.unl.fct.csd.Exceptions.AccountDoesNotExistException;
-import pt.unl.fct.csd.Exceptions.InvalidTransactionException;
+import pt.unl.fct.csd.Exceptions.ResourceDoesNotExistException;
+import pt.unl.fct.csd.Exceptions.InvalidOperationException;
 import pt.unl.fct.csd.Model.Transaction;
 import pt.unl.fct.csd.Model.UserAccount;
 import pt.unl.fct.csd.Repository.TransactionRepository;
@@ -32,7 +32,7 @@ public class WalletControllerImp implements WalletController {
     public void createMoney(Transaction transaction) {
 
         if(transaction.getAmount() < 0 || transaction.getTo().equals(SYSTEM_RESERVED_USER)){
-            throw new InvalidTransactionException();
+            throw new InvalidOperationException();
         }
 
         UserAccount account = userAccountRepository.findById(transaction.getTo())
@@ -50,14 +50,14 @@ public class WalletControllerImp implements WalletController {
     public void transferMoney(Transaction transaction) {
         if(transaction.getAmount() <= 0 || transaction.getTo().equals(SYSTEM_RESERVED_USER)
                 || transaction.getFrom().equals(SYSTEM_RESERVED_USER)){
-            throw new InvalidTransactionException();
+            throw new InvalidOperationException();
         }
 
         UserAccount userFrom = getUserOrException(transaction.getFrom());
         UserAccount userTo = getUserOrException(transaction.getTo());
 
         if(userFrom.getMoney() < transaction.getAmount()){
-            throw new InvalidTransactionException();
+            throw new InvalidOperationException();
         }
 
         userFrom.addMoney(transaction.getAmount() * -1);
@@ -78,7 +78,7 @@ public class WalletControllerImp implements WalletController {
         Optional<UserAccount> user = userAccountRepository.findById(id);
 
         if(!user.isPresent()){
-            throw new AccountDoesNotExistException();
+            throw new ResourceDoesNotExistException();
         }
 
         return user.get();

@@ -8,7 +8,7 @@ import pt.unl.fct.csd.Model.Bid;
 import java.util.List;
 
 @Repository
-public interface BidRepository extends JpaRepository<Bid, String> {
+public interface BidRepository extends JpaRepository<Bid, Long> {
 	
 	List<Bid> getAllByAuctionId(long auctionId);
 	

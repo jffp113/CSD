@@ -19,16 +19,16 @@ public class Bid {
 	private String bidderId;
 	
 	@Column(name = "auctionId", nullable = false)
-	private String auctionId;
+	private Long auctionId;
 
 	@Column(name = "value", nullable = false)
 	private int value;
 
-	public String getAuctionId() {
+	public Long getAuctionId() {
 		return auctionId;
 	}
 
-	public void setAuctionId(String auctionId) {
+	public void setAuctionId(Long auctionId) {
 		this.auctionId = auctionId;
 	}
 

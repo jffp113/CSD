@@ -14,7 +14,7 @@ public class Auction {
 	private String ownerId;
 
 	@Column(name = "closingBidId", nullable = true)
-	private String lastBidId;
+	private Long lastBidId;
 	
 	@Column(name = "isClosed", nullable = false)
 	private boolean isClosed = false;
@@ -37,7 +37,7 @@ public class Auction {
 		return ownerId;
 	}
 
-	public String getLastBid() {
+	public Long getLastBid() {
 		return lastBidId;
 	}
 
@@ -45,7 +45,7 @@ public class Auction {
 	 * returns true if the lastAuction is changed 
 	 * and false if it couldn't be because the auction was closed
 	 */
-	public boolean setlastBid(String lastBidId) {
+	public boolean setlastBid(Long lastBidId) {
 		if (!isClosed) {
 			this.lastBidId = lastBidId;
 			return true;
