@@ -31,15 +31,14 @@ public class WalletControllerImp implements WalletController {
     @Override
     public void createMoney(Transaction transaction) {
 
-        if(transaction.getAmount() < 0 || transaction.getTo().equals(SYSTEM_RESERVED_USER)){
+        if (transaction.getAmount() < 0 || transaction.getTo().equals(SYSTEM_RESERVED_USER)) {
             throw new InvalidOperationException();
         }
 
         UserAccount account = userAccountRepository.findById(transaction.getTo())
-                .orElse(new UserAccount(transaction.getTo(),0L));
+                .orElse(new UserAccount(transaction.getTo(), 0L));
 
         account.addMoney(transaction.getAmount());
-
 
         userAccountRepository.save(account);
         transaction.setFrom(SYSTEM_RESERVED_USER);
@@ -48,15 +47,15 @@ public class WalletControllerImp implements WalletController {
 
     @Override
     public void transferMoney(Transaction transaction) {
-        if(transaction.getAmount() <= 0 || transaction.getTo().equals(SYSTEM_RESERVED_USER)
-                || transaction.getFrom().equals(SYSTEM_RESERVED_USER)){
+        if (transaction.getAmount() <= 0 || transaction.getTo().equals(SYSTEM_RESERVED_USER)
+                || transaction.getFrom().equals(SYSTEM_RESERVED_USER)) {
             throw new InvalidOperationException();
         }
 
         UserAccount userFrom = getUserOrException(transaction.getFrom());
         UserAccount userTo = getUserOrException(transaction.getTo());
 
-        if(userFrom.getMoney() < transaction.getAmount()){
+        if (userFrom.getMoney() < transaction.getAmount()) {
             throw new InvalidOperationException();
         }
 
@@ -66,7 +65,6 @@ public class WalletControllerImp implements WalletController {
         userAccountRepository.save(userFrom);
         userAccountRepository.save(userTo);
         transactionRepository.save(transaction);
-
     }
 
     @Override
@@ -74,10 +72,10 @@ public class WalletControllerImp implements WalletController {
         return getUserOrException(id).getMoney();
     }
 
-    private UserAccount getUserOrException(String id){
+    private UserAccount getUserOrException(String id) {
         Optional<UserAccount> user = userAccountRepository.findById(id);
 
-        if(!user.isPresent()){
+        if (!user.isPresent()) {
             throw new ResourceDoesNotExistException();
         }
 
@@ -91,6 +89,6 @@ public class WalletControllerImp implements WalletController {
 
     @Override
     public List<Transaction> ledgerOfClientTransfers(String id) {
-        return transactionRepository.getByFrom(id);
+        return transactionRepository.getByFromOrTo(id, id);
     }
 }

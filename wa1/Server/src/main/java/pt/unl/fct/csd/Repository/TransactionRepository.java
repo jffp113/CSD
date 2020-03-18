@@ -8,7 +8,5 @@ import java.util.List;
 
 @Repository
 public interface TransactionRepository extends JpaRepository<Transaction, Long> {
-
-    List<Transaction> getByFrom(String id);
-
+    List<Transaction> getByFromOrTo(String from, String to);
 }
