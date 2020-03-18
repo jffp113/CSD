@@ -4,16 +4,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
-import pt.unl.fct.csd.Exceptions.InvalidOperationException;
-import pt.unl.fct.csd.Exceptions.ResourceDoesNotExistException;
+import pt.unl.fct.csd.Exceptions.*;
 import pt.unl.fct.csd.Model.Auction;
 import pt.unl.fct.csd.Model.Bid;
+import pt.unl.fct.csd.Model.Transaction;
 import pt.unl.fct.csd.Model.UserAccount;
 import pt.unl.fct.csd.Repository.AuctionRepository;
 import pt.unl.fct.csd.Repository.BidRepository;
 import pt.unl.fct.csd.Repository.UserAccountRepository;
 
 import java.util.List;
+import java.util.Optional;
+
+import static pt.unl.fct.csd.Controller.WalletControllerImp.SYSTEM_RESERVED_USER;
 
 @RestController
 public class AuctionControllerImp implements AuctionController {
@@ -84,15 +87,70 @@ public class AuctionControllerImp implements AuctionController {
 
 	//Todo improve check if user have money to bid
 	@Override
-	public void makeBid(Bid bid) {
-		 if(!userAccountRepository.existsById(bid.getBidderId())){
-		 	throw new InvalidOperationException();
-		 }
-
-		Auction auction = auctionRepository.findById(bid.getAuctionId()).
-				orElseThrow(InvalidOperationException::new);
-
-		bid = bidRepository.save(bid);
-		auction.setlastBid(bid.getId());
+	public void makeBid(Bid newBid) {
+		UserAccount bidder = getUserAccount(newBid.getBidderId());
+		Auction auction = getAuction(newBid.getAuctionId());
+		bidConsistencyChecks(bidder,newBid,auction);
+		replaceLastBid(auction, newBid, bidder);
+		bidRepository.save(newBid);
+		auctionRepository.save(auction);
+		userAccountRepository.save(bidder);
 	}
+
+	private UserAccount getUserAccount(String userId) {
+		Optional<UserAccount> user = userAccountRepository.findById(userId);
+		return user.orElseThrow(UserDoesNotExistException::new);
+	}
+
+	private Auction getAuction(Long auctionId) {
+		Optional<Auction> auction = auctionRepository.findById(auctionId);
+		return auction.orElseThrow(AuctionDoesNotExistException::new);
+	}
+
+	private void bidConsistencyChecks(UserAccount bidder, Bid newBid, Auction auction) {
+		if (!userHasEnoughMoney(bidder, newBid))
+			throw new UserDoesNotHaveTheMoneyToMakeBidException();
+		if (auction.isAuctionClosed())
+			throw new AuctionIsAlreadyClosedException();
+	}
+
+	private boolean userHasEnoughMoney(UserAccount bidder, Bid newBid) {
+		return bidder.getMoney() >= newBid.getValue();
+	}
+
+	private void replaceLastBid(Auction auction, Bid newBid, UserAccount bidder) {
+		try {
+			tryToReplaceLastBid(newBid);
+		} catch (BidDoesNotExistException e) {}
+		auction.setlastBid(newBid.getId());
+		removeMoneyFromBid(bidder, newBid.getValue());
+	}
+
+	private void tryToReplaceLastBid(Bid newBid) {
+		Bid last = getBid(newBid.getId());
+		if (newBid.getValue() <= last.getValue())
+			throw new BidAmountIsTooSmallToSurpassPreviousException();
+		reimbursePreviousBidder(last.getBidderId(), last.getValue());
+	}
+
+	private void reimbursePreviousBidder(String bidder, int amount) {
+		Transaction t = new Transaction();
+		t.setTo(bidder);
+		t.setAmount((long) amount);
+		new WalletControllerImp().createMoney(t);
+	}
+
+	private Bid getBid(Long bidId) {
+		Optional<Bid> bid = bidRepository.findById(bidId);
+		return bid.orElseThrow(BidDoesNotExistException::new);
+	}
+
+	private void removeMoneyFromBid(UserAccount bidder, int bidValue) {
+		Transaction t = new Transaction();
+		t.setFrom(bidder.getId());
+		t.setTo(SYSTEM_RESERVED_USER);
+		t.setAmount((long) bidValue);
+		new WalletControllerImp().transferMoney(t);
+	}
+
 }
