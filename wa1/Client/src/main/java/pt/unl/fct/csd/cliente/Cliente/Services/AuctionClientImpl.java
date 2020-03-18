@@ -124,6 +124,6 @@ public class AuctionClientImpl implements AuctionClient {
 	@Override
 	public void createBid(String bidderId, Long auctionId, int value) {
 		Bid bid = new Bid(bidderId, auctionId, value);
-		restTemplate.postForEntity(Path.CREATE_BID.url,bid,Void.class);
+		restTemplate.postForEntity(BASE + Path.CREATE_BID.url,bid,Void.class);
 	}
 }

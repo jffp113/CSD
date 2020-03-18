@@ -74,6 +74,10 @@ public class AuctionControllerImp implements AuctionController {
 		Auction auction = auctionRepository.findById(auctionId).
 				orElseThrow(ResourceDoesNotExistException::new);
 		Long bidId = auction.getLastBid();
+
+		if(bidId == null)
+			throw new InvalidOperationException();
+
 		return bidRepository.findById(bidId).
 				orElseThrow(ResourceDoesNotExistException::new);
 	}
@@ -81,7 +85,7 @@ public class AuctionControllerImp implements AuctionController {
 	//Todo improve check if user have money to bid
 	@Override
 	public void makeBid(Bid bid) {
-		 if(userAccountRepository.existsById(bid.getBidderId())){
+		 if(!userAccountRepository.existsById(bid.getBidderId())){
 		 	throw new InvalidOperationException();
 		 }
 
