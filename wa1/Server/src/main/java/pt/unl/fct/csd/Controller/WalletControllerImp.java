@@ -1,5 +1,6 @@
 package pt.unl.fct.csd.Controller;
 
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,9 +47,8 @@ public class WalletControllerImp implements WalletController {
     }
 
     @Override
-    public void transferMoney(Transaction transaction) {
-        if (transaction.getAmount() <= 0 || transaction.getTo().equals(SYSTEM_RESERVED_USER)
-                || transaction.getFrom().equals(SYSTEM_RESERVED_USER)) {
+    public void transferMoneyBetweenUsers(Transaction transaction) {
+        if (isTransferValid(transaction)) {
             throw new InvalidOperationException();
         }
 
@@ -65,6 +65,19 @@ public class WalletControllerImp implements WalletController {
         userAccountRepository.save(userFrom);
         userAccountRepository.save(userTo);
         transactionRepository.save(transaction);
+    }
+
+    private boolean isTransferValid(Transaction transaction) {
+        return isTransferAmountValid(transaction.getAmount()) && !doesTransferInvolveSystem(transaction);
+    }
+
+    private boolean isTransferAmountValid(Long amount) {
+        return amount != null && amount > 0;
+    }
+
+    private boolean doesTransferInvolveSystem(Transaction transaction) {
+        return transaction.getTo().equals(SYSTEM_RESERVED_USER) ||
+                transaction.getFrom().equals(SYSTEM_RESERVED_USER);
     }
 
     @Override
@@ -90,5 +103,27 @@ public class WalletControllerImp implements WalletController {
     @Override
     public List<Transaction> ledgerOfClientTransfers(String id) {
         return transactionRepository.getByFromOrTo(id, id);
+    }
+
+    @Override
+    public void removeMoney(@NotNull UserAccount user, long amount) {
+        transferMoney(user.getId(), SYSTEM_RESERVED_USER, amount);
+        user.addMoney(-1 * amount);
+        userAccountRepository.save(user);
+    }
+
+    @Override
+    public void addMoney(@NotNull UserAccount user, long amount) {
+        transferMoney(SYSTEM_RESERVED_USER, user.getId(), amount);
+        user.addMoney(amount);
+        userAccountRepository.save(user);
+    }
+
+    private void transferMoney(String from, String to, Long amount) {
+        Transaction t = new Transaction();
+        t.setFrom(from);
+        t.setTo(to);
+        t.setAmount(amount);
+        transactionRepository.save(t);
     }
 }

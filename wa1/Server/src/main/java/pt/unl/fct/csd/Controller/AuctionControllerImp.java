@@ -33,6 +33,9 @@ public class AuctionControllerImp implements AuctionController {
     @Autowired
     private BidRepository bidRepository;
 
+    @Autowired
+    private WalletControllerImp walletControllerImp;
+
 	@Override
 	public void createAuction(String ownerId) {
 		if (!userAccountRepository.existsById(ownerId)) {
@@ -92,9 +95,7 @@ public class AuctionControllerImp implements AuctionController {
 		Auction auction = getAuction(newBid.getAuctionId());
 		bidConsistencyChecks(bidder,newBid,auction);
 		replaceLastBid(auction, newBid, bidder);
-		bidRepository.save(newBid);
 		auctionRepository.save(auction);
-		userAccountRepository.save(bidder);
 	}
 
 	private UserAccount getUserAccount(String userId) {
@@ -120,37 +121,36 @@ public class AuctionControllerImp implements AuctionController {
 
 	private void replaceLastBid(Auction auction, Bid newBid, UserAccount bidder) {
 		try {
-			tryToReplaceLastBid(newBid);
+			tryToReplaceLastBid(newBid, auction);
 		} catch (BidDoesNotExistException e) {}
+		bidRepository.save(newBid);			//Bid must be saved here in order to have an ID
 		auction.setlastBid(newBid.getId());
 		removeMoneyFromBid(bidder, newBid.getValue());
 	}
 
-	private void tryToReplaceLastBid(Bid newBid) {
-		Bid last = getBid(newBid.getId());
+	private void tryToReplaceLastBid(Bid newBid, Auction auction) throws BidDoesNotExistException{
+		Bid last = getBid(auction.getLastBid());
 		if (newBid.getValue() <= last.getValue())
 			throw new BidAmountIsTooSmallToSurpassPreviousException();
 		reimbursePreviousBidder(last.getBidderId(), last.getValue());
 	}
 
-	private void reimbursePreviousBidder(String bidder, int amount) {
-		Transaction t = new Transaction();
-		t.setTo(bidder);
-		t.setAmount((long) amount);
-		new WalletControllerImp().createMoney(t);
-	}
-
-	private Bid getBid(Long bidId) {
+	private Bid getBid(Long bidId) throws BidDoesNotExistException{
+		if (bidId == null)
+			throw new BidDoesNotExistException();
 		Optional<Bid> bid = bidRepository.findById(bidId);
 		return bid.orElseThrow(BidDoesNotExistException::new);
 	}
 
-	private void removeMoneyFromBid(UserAccount bidder, int bidValue) {
+	private void reimbursePreviousBidder(String bidder, long amount) {
 		Transaction t = new Transaction();
-		t.setFrom(bidder.getId());
-		t.setTo(SYSTEM_RESERVED_USER);
-		t.setAmount((long) bidValue);
-		new WalletControllerImp().transferMoney(t);
+		t.setTo(bidder);
+		t.setAmount(amount);
+		walletControllerImp.createMoney(t);
+	}
+
+	private void removeMoneyFromBid(UserAccount bidder, long bidValue) {
+		walletControllerImp.removeMoney(bidder, bidValue);
 	}
 
 }

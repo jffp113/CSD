@@ -20,14 +20,6 @@ public class Transaction {
     @Column(name="amount", nullable = false)
     private Long amount;
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
     public String getFrom() {
         return from;
     }

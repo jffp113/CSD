@@ -15,7 +15,7 @@ public interface AuctionController {
 
     String BASE_URL = "/auctions";
     String CREATE_AUCTION = "/create/{ownerId}";
-    String CREATE_BID_AUCTION = "/create/bid/";
+    String CREATE_BID_AUCTION = "/create/bid";
     String TERMINATE_AUCTION = "/terminate/{auctionId}";
     String GET_CLOSE_BID = "/{auctionId}/closebid";	
     String GET_OPEN_AUCTIONS = "/open";

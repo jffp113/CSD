@@ -30,10 +30,10 @@ public class AuctionClientImpl implements AuctionClient {
     	CREATE_AUCTION("/create/%s"),
     	CREATE_BID("/create/bid"),
     	TERMINATE_AUCTION("/terminate/%s"),
-    	GET_CLOSE_BID("/%d/closebid"),
+    	GET_CLOSE_BID("/%l/closebid"),
     	GET_OPEN_AUCTIONS("/open"),
     	GET_CLOSED_AUCTIONS("/closed"),
-    	GET_AUCTION_BIDS("/%d/bids"),
+    	GET_AUCTION_BIDS("/%l/bids"),
     	GET_CLIENT_BIDS("/client/%s");
     	
     	private static final String BASE_URL = "/auctions";
@@ -124,6 +124,7 @@ public class AuctionClientImpl implements AuctionClient {
 	@Override
 	public void createBid(String bidderId, Long auctionId, int value) {
 		Bid bid = new Bid(bidderId, auctionId, value);
-		restTemplate.postForEntity(BASE + Path.CREATE_BID.url,bid,Void.class);
+		String urlComplete = String.format(Path.CREATE_BID.url, BASE);
+		restTemplate.postForEntity(urlComplete,bid,Void.class);
 	}
 }

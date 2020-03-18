@@ -22,7 +22,7 @@ public class Bid {
 	private Long auctionId;
 
 	@Column(name = "value", nullable = false)
-	private int value;
+	private Long value;
 
 	public Long getAuctionId() {
 		return auctionId;
@@ -48,11 +48,11 @@ public class Bid {
 		this.bidderId = bidderId;
 	}
 
-	public int getValue() {
+	public Long getValue() {
 		return value;
 	}
 
-	public void setValue(int value) {
+	public void setValue(Long value) {
 		this.value = value;
 	}
 }

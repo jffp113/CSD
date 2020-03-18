@@ -2,6 +2,7 @@ package pt.unl.fct.csd.Controller;
 
 import org.springframework.web.bind.annotation.*;
 import pt.unl.fct.csd.Model.Transaction;
+import pt.unl.fct.csd.Model.UserAccount;
 
 import java.util.List;
 
@@ -39,7 +40,7 @@ public interface WalletController {
     @PostMapping(
             value = TRANSFER_MONEY,
             consumes = APPLICATION_JSON_VALUE)
-    void transferMoney(@RequestBody Transaction transaction);
+    void transferMoneyBetweenUsers(@RequestBody Transaction transaction);
 
     /**
      * //TODO
@@ -60,5 +61,9 @@ public interface WalletController {
             value = GET_CLIENT_LEDGER,
             produces = APPLICATION_JSON_VALUE)
     List<Transaction> ledgerOfClientTransfers(@PathVariable("id") String id);
+
+    void removeMoney(UserAccount user, long amount);
+
+    void addMoney(UserAccount user, long amount);
 }
 
