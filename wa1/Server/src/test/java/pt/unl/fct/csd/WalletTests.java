@@ -12,6 +12,9 @@ import pt.unl.fct.csd.Controller.WalletController;
 import pt.unl.fct.csd.Model.Transaction;
 import pt.unl.fct.csd.Repository.UserAccountRepository;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -165,7 +168,62 @@ class WalletTests {
 
     }
 
-    //TODO add more tests
+    @Test
+    void testGetLedger() throws Exception {
+        final String username1 = "user1",username2 = "user2" , system = "SYSTEM";
+        final long amount1 = 9000L;
+        List<Transaction> globalLedger = new LinkedList<>();
+        List<Transaction> clientLedger = new LinkedList<>();
+        Transaction transaction1 = Transaction.createFromToWithAmount(system,username1,amount1);
+        Transaction transaction2 = Transaction.createFromToWithAmount(system,username2,amount1);
+        Transaction transaction3 = Transaction.createFromToWithAmount(username1,username2,amount1);
+
+        performCreateMoney(Transaction.createToWithAmount(username1,amount1))
+                .andExpect(status().isOk());
+        globalLedger.add(transaction1);
+        clientLedger.add(transaction1);
+
+        performGetClientLedger(username1)
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(clientLedger)));
+
+
+        performGetLedger()
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(globalLedger)));
+
+        globalLedger.add(transaction2);
+
+        performCreateMoney(Transaction.createToWithAmount(username2,amount1))
+                .andExpect(status().isOk());
+
+
+        performGetClientLedger(username1)
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(clientLedger)));
+
+
+        performGetLedger()
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(globalLedger)));
+
+
+        clientLedger.add(transaction3);
+        globalLedger.add(transaction3);
+
+        performTransferMoney(transaction3);
+
+        performGetClientLedger(username1)
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(clientLedger)));
+
+
+        performGetLedger()
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(globalLedger)));
+
+    }
+
 
     private ResultActions performCreateMoney(Transaction transaction) throws Exception {
         return mockMvc.perform(post(walletController.BASE_URL + walletController.CREATE_MONEY)
