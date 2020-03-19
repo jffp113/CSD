@@ -48,7 +48,7 @@ public class WalletControllerImp implements WalletController {
 
     @Override
     public void transferMoneyBetweenUsers(Transaction transaction) {
-        if (isTransferValid(transaction)) {
+        if (!isTransferValid(transaction)) {
             throw new InvalidOperationException();
         }
 

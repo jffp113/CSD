@@ -20,6 +20,21 @@ public class Transaction {
     @Column(name="amount", nullable = false)
     private Long amount;
 
+
+    public static Transaction createToWithAmount(String to,Long amount){
+       Transaction tmp = new Transaction();
+       tmp.setTo(to);
+       tmp.setAmount(amount);
+       return tmp;
+    }
+
+    public static Transaction createFromToWithAmount(String from, String to,Long amount){
+        Transaction tmp = createToWithAmount(to,amount);
+        tmp.setFrom(from);
+
+        return tmp;
+    }
+
     public String getFrom() {
         return from;
     }
