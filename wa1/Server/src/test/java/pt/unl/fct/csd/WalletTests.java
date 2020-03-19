@@ -10,10 +10,12 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import pt.unl.fct.csd.Controller.WalletController;
 import pt.unl.fct.csd.Model.Transaction;
+import pt.unl.fct.csd.Model.UserAccount;
 import pt.unl.fct.csd.Repository.UserAccountRepository;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
@@ -39,7 +41,7 @@ class WalletTests {
     private WalletController walletController;
     @Autowired
     private UserAccountRepository userRepository;
-    
+
     @Test
     void contextLoads() {
         assertThat(mockMvc).isNotNull();
@@ -49,43 +51,35 @@ class WalletTests {
     }
 
     @Test
-    void testMoneyCreationOk() throws Exception {
-        final String username1 = "user1", username2 = "user2";
-        final long amount = 9001L;
+    void testMoneyCreationOK() throws Exception{
+        final String username1 = "user1";
+        final long amount = 1;
 
-        performGetCurrentAmount(username1)
-                .andExpect(status().isNotFound());
+        performCreateMoney(Transaction.createToWithAmount(username1,amount)).andExpect(status().isOk());
+        Optional<UserAccount> user = userRepository.findById(username1);
+        assertThat(user.isPresent() && user.get().getMoney().equals(amount));
 
-        //create users, create money, checks amount
-        performCreateMoney(Transaction.createToWithAmount(username1, amount))
-                .andExpect(status().isOk());
-
-        assertThat(userRepository.findById(username1).get().getMoney().equals(amount));
-
-        performGetCurrentAmount(username1)
-                .andExpect(status().isOk()).andExpect(content().json(Long.toString(amount)));
-
-        performCreateMoney(Transaction.createToWithAmount(username2, amount))
-                .andExpect(status().isOk());
-        assertThat(userRepository.findById(username2).get().getMoney().equals(amount));
-
-        //just create money and give it to user1
-        performCreateMoney(Transaction.createToWithAmount(username1, amount))
-                .andExpect(status().isOk());
-        assertThat(userRepository.findById(username1).get().getMoney() == amount * 2);
-
-        //tries to "destroy" money
-        performCreateMoney(Transaction.createToWithAmount(username1, amount * -1))
-                .andExpect(status().isBadRequest());
-        assertThat(!userRepository.findById(username1).get().getMoney().equals(amount));
-
-        //final amount check
-        performGetCurrentAmount(username1)
-                .andExpect(status().isOk())
-                .andExpect(content().json(Long.toString(amount * 2)));
-
+        performCreateMoney(Transaction.createToWithAmount(username1,amount)).andExpect(status().isOk());
+        user = userRepository.findById(username1);
+        assertThat(user.isPresent() && user.get().getMoney().equals(amount*2));
     }
 
+    @Test
+    void testCurrentAmountOK() throws Exception {
+        final String username1 = "user1";
+        final long amount = 1;
+
+        performCreateMoney(Transaction.createToWithAmount(username1,amount)).andExpect(status().isOk());
+        performGetCurrentAmount(username1).andExpect(status().isOk()).andExpect(content().json(Long.toString(amount)));
+    }
+
+    @Test
+    void testCurrentAmountNotFound() throws Exception {
+        final String username1 = "user1";
+
+        assertThat(!userRepository.findById(username1).isPresent());
+        performGetCurrentAmount(username1).andExpect(status().isNotFound());
+    }
     @Test
     void testMoneyCreationAmountNegative() throws Exception {
         final String username1 = "user1";
