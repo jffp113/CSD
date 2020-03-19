@@ -86,6 +86,7 @@ class WalletTests {
         final long amount = -1;
 
         performCreateMoney(Transaction.createToWithAmount(username1,amount)).andExpect(status().isBadRequest());
+        assertThat(!userRepository.findById(username1).isPresent());
     }
 
     @Test
@@ -94,6 +95,7 @@ class WalletTests {
         final long amount = 1000;
 
         performCreateMoney(Transaction.createToWithAmount(username1,amount)).andExpect(status().isBadRequest());
+        assertThat(!userRepository.findById(username1).isPresent());
     }
 
     @Test
@@ -110,7 +112,12 @@ class WalletTests {
 
         performTransferMoney(Transaction.createFromToWithAmount(username1,username2,transferAmount))
                 .andExpect(status().isOk());
+        Optional<UserAccount> user1 = userRepository.findById(username1), user2 = userRepository.findById(username2);
+        //using user.isPresent() to avoid warnings
+        assertThat((user1.isPresent() && user1.get().getMoney().equals(amount1 - transferAmount)
+                && user2.isPresent() && user2.get().getMoney().equals(amount2 + transferAmount)));
 
+        //TODO maybe this can be removed? already tested
         performGetCurrentAmount(username1)
                 .andExpect(status().isOk())
                 .andExpect(content().json(Long.toString(amount1 - transferAmount)));
@@ -137,11 +144,28 @@ class WalletTests {
         performTransferMoney(Transaction.createFromToWithAmount(username1,username2,transferAmount2))
                 .andExpect(status().isBadRequest());
 
-        performTransferMoney(Transaction.createFromToWithAmount(username1,system,transferAmount1))
-                .andExpect(status().isBadRequest());
+        Optional<UserAccount> user1 = userRepository.findById(username1), user2 = userRepository.findById(username2);
+        //using user.isPresent() to avoid warnings
+        assertThat((user1.isPresent() && user1.get().getMoney().equals(amount1)
+                && user2.isPresent() && user2.get().getMoney().equals(amount2)));
 
         performTransferMoney(Transaction.createFromToWithAmount(username1,system,transferAmount1))
                 .andExpect(status().isBadRequest());
+
+         user1 = userRepository.findById(username1);
+         user2 = userRepository.findById(username2);
+        //using user.isPresent() to avoid warnings
+        assertThat((user1.isPresent() && user1.get().getMoney().equals(amount1)
+                && user2.isPresent() && user2.get().getMoney().equals(amount2)));
+
+        performTransferMoney(Transaction.createFromToWithAmount(username1,system,transferAmount1))
+                .andExpect(status().isBadRequest());
+
+        user1 = userRepository.findById(username1);
+        user2 = userRepository.findById(username2);
+        //using user.isPresent() to avoid warnings
+        assertThat((user1.isPresent() && user1.get().getMoney().equals(amount1)
+                && user2.isPresent() && user2.get().getMoney().equals(amount2)));
     }
 
     @Test
@@ -153,13 +177,18 @@ class WalletTests {
         performCreateMoney(Transaction.createToWithAmount(username1,amount1))
                 .andExpect(status().isOk());
 
-
         performTransferMoney(Transaction.createFromToWithAmount(username1,username2,transferAmount1))
                 .andExpect(status().isNotFound());
+
+        Optional<UserAccount> user = userRepository.findById(username1);
+        //using user.isPresent() to avoid warnings
+        assertThat((user.isPresent() && user.get().getMoney().equals(amount1)));
 
         performTransferMoney(Transaction.createFromToWithAmount(username2,username1,transferAmount1))
                 .andExpect(status().isNotFound());
 
+        user = userRepository.findById(username1);
+        assertThat((user.isPresent() && user.get().getMoney().equals(amount1)));
     }
 
     @Test
@@ -180,7 +209,6 @@ class WalletTests {
         performGetClientLedger(username1)
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(clientLedger)));
-
 
         performGetLedger()
                 .andExpect(status().isOk())
