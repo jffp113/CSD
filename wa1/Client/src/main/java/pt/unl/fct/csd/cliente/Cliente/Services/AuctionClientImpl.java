@@ -10,12 +10,14 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import pt.unl.fct.csd.cliente.Cliente.Handlers.RestTemplateResponseErrorHandler;
 import pt.unl.fct.csd.cliente.Cliente.Model.Auction;
 import pt.unl.fct.csd.cliente.Cliente.Model.Bid;
+import pt.unl.fct.csd.cliente.Cliente.exceptions.ServerAnswerException;
 
 @Service
 @PropertySource("classpath:application.properties")
@@ -66,65 +68,82 @@ public class AuctionClientImpl implements AuctionClient {
 
 
 	@Override
-	public void createAuction(String ownerId) {
+	public Long createAuction(String ownerId) throws ServerAnswerException {
 		String urlWithId = String.format(Path.CREATE_AUCTION.url, BASE, ownerId);
-		restTemplate.postForEntity(urlWithId, null, Void.class);
+		ResponseEntity<String> response =
+				restTemplate.postForEntity(urlWithId, null, String.class);
+		return new HandleServerAnswer<Long>().processServerAnswer(response, Long.class);
 	}
 
 	@Override
 	public void terminateAuction(long auctionId) {
 		String urlWithId = String.format(Path.TERMINATE_AUCTION.url, BASE, auctionId);
-		restTemplate.put(urlWithId, null); //TODO CHANGE TO GOOD
+		restTemplate.put(urlWithId, null);	//TODO CHECK THIS ONE ERROR HANDLING
 	}
 
 	@Override
-	public List<Auction> getOpenAuctions() {
+	public List<Auction> getOpenAuctions() throws ServerAnswerException {
 		String urlComplete = String.format(Path.GET_OPEN_AUCTIONS.url, BASE);
-		Auction[] auctions = restTemplate.
-				getForEntity(urlComplete, Auction[].class).
-				getBody();
-		return Arrays.asList(auctions);
+		return new ListObjects<Auction>().getListFromUrl(urlComplete, Auction[].class);
+		//Auction[] auctions = restTemplate.
+		//		getForEntity(urlComplete, Auction[].class).
+		//		getBody();
+		//return Arrays.asList(auctions);
 	}
 
 	@Override
-	public List<Auction> getClosedAuctions() {
+	public List<Auction> getClosedAuctions() throws ServerAnswerException {
 		String urlComplete = String.format(Path.GET_CLOSED_AUCTIONS.url, BASE);
-		Auction[] auctions = restTemplate.
-				getForEntity(urlComplete, Auction[].class).
-				getBody();
-		return Arrays.asList(auctions);
+		return new ListObjects<Auction>().getListFromUrl(urlComplete, Auction[].class);
+		//Auction[] auctions = restTemplate.
+		//		getForEntity(urlComplete, Auction[].class).
+		//		getBody();
+		//return Arrays.asList(auctions);
 	}
 
 	@Override
-	public List<Bid> getAuctionBids(long auctionId) {
-		String urlComplete = String.format(Path.GET_AUCTION_BIDS.url, BASE);
-		Bid[] bids = restTemplate.
+	public List<Bid> getAuctionBids(long auctionId) throws ServerAnswerException {
+		String urlComplete = String.format(Path.GET_AUCTION_BIDS.url, BASE, auctionId);
+		return new ListObjects<Bid>().getListFromUrl(urlComplete, Bid[].class);
+		/*Bid[] bids = restTemplate.
 				getForEntity(urlComplete, Bid[].class).
 				getBody();
-		return Arrays.asList(bids);
+		return Arrays.asList(bids);*/
 	}
 
 	@Override
-	public List<Bid> getClientBids(String clientId) {
+	public List<Bid> getClientBids(String clientId) throws ServerAnswerException {
 		String urlComplete = String.format(Path.GET_CLIENT_BIDS.url, BASE, clientId);
-		Bid[] bids = restTemplate.
+		return new ListObjects<Bid>().getListFromUrl(urlComplete, Bid[].class);
+		/*Bid[] bids = restTemplate.
 				getForEntity(urlComplete, Bid[].class).
 				getBody();
-		return Arrays.asList(bids);
+		return Arrays.asList(bids);*/
 	}
 
 	@Override
-	public Bid getClosedBid(long auctionId) {
+	public Bid getClosedBid(long auctionId) throws ServerAnswerException {
 		String urlWithId = String.format(Path.GET_CLOSE_BID.url, BASE, auctionId);
-		return restTemplate.
-				getForEntity(urlWithId, Bid.class).
-				getBody();
+		ResponseEntity<String> response = restTemplate.getForEntity(urlWithId, String.class);
+		return new HandleServerAnswer<Bid>().processServerAnswer(response, Bid.class);
 	}
 
 	@Override
-	public void createBid(String bidderId, Long auctionId, int value) {
+	public Long createBid(String bidderId, Long auctionId, int value) throws ServerAnswerException {
 		Bid bid = new Bid(bidderId, auctionId, value);
 		String urlComplete = String.format(Path.CREATE_BID.url, BASE);
-		restTemplate.postForEntity(urlComplete,bid,Void.class);
+		ResponseEntity<String> response =
+				restTemplate.postForEntity(urlComplete,bid,String.class);
+		return new HandleServerAnswer<Long>().processServerAnswer(response, Long.class);
+	}
+
+	private class ListObjects<E> {
+
+    	private List<E> getListFromUrl (String url, Class<E[]> klass) throws ServerAnswerException {
+    		ResponseEntity<String> response =
+					restTemplate.getForEntity(url, null, String.class);
+    		E[] elements = new HandleServerAnswer<E[]>().processServerAnswer(response, klass);
+    		return Arrays.asList(elements);
+		}
 	}
 }

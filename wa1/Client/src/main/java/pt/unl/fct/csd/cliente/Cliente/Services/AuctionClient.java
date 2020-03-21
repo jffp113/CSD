@@ -4,22 +4,23 @@ import java.util.List;
 
 import pt.unl.fct.csd.cliente.Cliente.Model.Auction;
 import pt.unl.fct.csd.cliente.Cliente.Model.Bid;
+import pt.unl.fct.csd.cliente.Cliente.exceptions.ServerAnswerException;
 
 public interface AuctionClient {
 
-	void createAuction(String ownerId);
+	Long createAuction(String ownerId) throws ServerAnswerException;
 	
 	void terminateAuction(long auctionId);
 	
-	List<Auction> getOpenAuctions();
+	List<Auction> getOpenAuctions() throws ServerAnswerException;
 	
-	List<Auction> getClosedAuctions();
+	List<Auction> getClosedAuctions() throws ServerAnswerException;
 	
-	List<Bid> getAuctionBids(long auctionId);
+	List<Bid> getAuctionBids(long auctionId) throws ServerAnswerException;
 	
-	List<Bid> getClientBids(String clientId);
+	List<Bid> getClientBids(String clientId) throws ServerAnswerException;
 	
-	Bid getClosedBid(long Auction);
+	Bid getClosedBid(long Auction) throws ServerAnswerException;
 
-	void createBid(String bidderId, Long auctionId, int value);
+	Long createBid(String bidderId, Long auctionId, int value) throws ServerAnswerException;
 }

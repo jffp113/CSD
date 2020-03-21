@@ -24,7 +24,7 @@ public interface AuctionController {
     String GET_CLIENT_BIDS = "/client/{clientId}";
     
     @PostMapping(value = CREATE_AUCTION)
-    void createAuction(@PathVariable("ownerId") String ownerId);
+    Long createAuction(@PathVariable("ownerId") String ownerId);
  
     @PutMapping(value = TERMINATE_AUCTION)
     void terminateAuction(@PathVariable("auctionId") long auctionId);
@@ -57,6 +57,6 @@ public interface AuctionController {
     @PostMapping(
             value = CREATE_BID_AUCTION,
             consumes = APPLICATION_JSON_VALUE)
-    void makeBid(@RequestBody Bid bid);
+    Long makeBid(@RequestBody Bid bid);
 }
 

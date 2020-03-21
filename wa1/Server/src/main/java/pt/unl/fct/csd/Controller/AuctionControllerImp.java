@@ -16,8 +16,6 @@ import pt.unl.fct.csd.Repository.UserAccountRepository;
 import java.util.List;
 import java.util.Optional;
 
-import static pt.unl.fct.csd.Controller.WalletControllerImp.SYSTEM_RESERVED_USER;
-
 @RestController
 public class AuctionControllerImp implements AuctionController {
 
@@ -26,31 +24,35 @@ public class AuctionControllerImp implements AuctionController {
 
     @Autowired
     private AuctionRepository auctionRepository;
-    
-    @Autowired
-    private UserAccountRepository userAccountRepository;
 
     @Autowired
     private BidRepository bidRepository;
 
     @Autowired
+    private UserAccountRepository userAccountRepository;
+
+    @Autowired
     private WalletControllerImp walletControllerImp;
 
 	@Override
-	public void createAuction(String ownerId) {
-		if (!userAccountRepository.existsById(ownerId)) {
-			throw new ResourceDoesNotExistException();
-		}
+	public Long createAuction(String ownerId) {
+		if (!existsUser(ownerId))
+			throw new UserDoesNotExistException(ownerId);
 
 		Auction auction = new Auction();
 		auction.setOwner(ownerId);
 		auctionRepository.save(auction);
+		return auction.getId();
+	}
+
+	private boolean existsUser(String userId) {
+		//return new UserCommonsImpl().existsUserAccount(userId);
+		return existsUserAccount(userId);
 	}
 
 	@Override
 	public void terminateAuction(long auctionId) {
-		Auction auction = auctionRepository.findById(auctionId).
-			orElseThrow(ResourceDoesNotExistException::new);
+		Auction auction = getAuction(auctionId);
 		auction.closeAuction();
 		auctionRepository.save(auction);
 	}
@@ -77,45 +79,39 @@ public class AuctionControllerImp implements AuctionController {
 
 	@Override
 	public Bid getCloseBid(long auctionId) {
-		Auction auction = auctionRepository.findById(auctionId).
-				orElseThrow(ResourceDoesNotExistException::new);
+		Auction auction = getAuction(auctionId);
 		Long bidId = auction.getLastBid();
-
-		if(bidId == null)
-			throw new InvalidOperationException();
-
-		return bidRepository.findById(bidId).
-				orElseThrow(ResourceDoesNotExistException::new);
+		return getBid(bidId);
 	}
 
-	//Todo improve check if user have money to bid
 	@Override
-	public void makeBid(Bid newBid) {
-		UserAccount bidder = getUserAccount(newBid.getBidderId());
+	public Long makeBid(Bid newBid) {
+		UserAccount bidder = getUser(newBid.getBidderId());
 		Auction auction = getAuction(newBid.getAuctionId());
 		bidConsistencyChecks(bidder,newBid,auction);
 		replaceLastBid(auction, newBid, bidder);
 		auctionRepository.save(auction);
+		return newBid.getId();
 	}
 
-	private UserAccount getUserAccount(String userId) {
-		Optional<UserAccount> user = userAccountRepository.findById(userId);
-		return user.orElseThrow(UserDoesNotExistException::new);
+	private UserAccount getUser(String userId) {
+		//return new UserCommonsImpl().getUserAccount(userId);
+		return getUserAccount(userId);
 	}
 
 	private Auction getAuction(Long auctionId) {
 		Optional<Auction> auction = auctionRepository.findById(auctionId);
-		return auction.orElseThrow(AuctionDoesNotExistException::new);
+		return auction.orElseThrow(() -> new AuctionDoesNotExistException(auctionId));
 	}
 
 	private void bidConsistencyChecks(UserAccount bidder, Bid newBid, Auction auction) {
-		if (!userHasEnoughMoney(bidder, newBid))
-			throw new UserDoesNotHaveTheMoneyToMakeBidException();
+		if (!doesUserHaveEnoughMoney(bidder, newBid))
+			throw new UserDoesNotHaveTheMoneyToMakeBidException(bidder.getId(), newBid.getValue());
 		if (auction.isAuctionClosed())
-			throw new AuctionIsAlreadyClosedException();
+			throw new AuctionIsAlreadyClosedException(auction.getId());
 	}
 
-	private boolean userHasEnoughMoney(UserAccount bidder, Bid newBid) {
+	private boolean doesUserHaveEnoughMoney(UserAccount bidder, Bid newBid) {
 		return bidder.getMoney() >= newBid.getValue();
 	}
 
@@ -131,15 +127,15 @@ public class AuctionControllerImp implements AuctionController {
 	private void tryToReplaceLastBid(Bid newBid, Auction auction) throws BidDoesNotExistException{
 		Bid last = getBid(auction.getLastBid());
 		if (newBid.getValue() <= last.getValue())
-			throw new BidAmountIsTooSmallToSurpassPreviousException();
+			throw new BidAmountIsTooSmallToSurpassPreviousException(last.getValue());
 		reimbursePreviousBidder(last.getBidderId(), last.getValue());
 	}
 
 	private Bid getBid(Long bidId) throws BidDoesNotExistException{
 		if (bidId == null)
 			throw new BidDoesNotExistException();
-		Optional<Bid> bid = bidRepository.findById(bidId);
-		return bid.orElseThrow(BidDoesNotExistException::new);
+		return bidRepository.findById(bidId).
+				orElseThrow(BidDoesNotExistException::new);
 	}
 
 	private void reimbursePreviousBidder(String bidder, long amount) {
@@ -151,6 +147,26 @@ public class AuctionControllerImp implements AuctionController {
 
 	private void removeMoneyFromBid(UserAccount bidder, long bidValue) {
 		walletControllerImp.removeMoney(bidder, bidValue);
+	}
+
+	/**************************************************************/
+
+	public boolean existsUserAccount(String userId) {
+		try {
+			getUserAccount(userId);
+			return true;
+		} catch (UserDoesNotExistException e) {
+			return false;
+		}
+	}
+
+	public UserAccount getUserAccount(String userId) throws UserDoesNotExistException{
+		Optional<UserAccount> user = userAccountRepository.findById(userId);
+		return user.orElseThrow(() -> new UserDoesNotExistException(userId));
+	}
+
+	public void saveUserInDB(UserAccount user) {
+		userAccountRepository.save(user);
 	}
 
 }
