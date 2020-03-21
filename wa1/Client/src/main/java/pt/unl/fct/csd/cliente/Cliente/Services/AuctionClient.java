@@ -10,7 +10,7 @@ public interface AuctionClient {
 
 	Long createAuction(String ownerId) throws ServerAnswerException;
 	
-	void terminateAuction(long auctionId);
+	void terminateAuction(long auctionId) throws ServerAnswerException;
 	
 	List<Auction> getOpenAuctions() throws ServerAnswerException;
 	

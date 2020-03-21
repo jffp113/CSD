@@ -91,6 +91,8 @@ public class WalletControllerImp implements WalletController {
 
     @Override
     public List<Transaction> ledgerOfClientTransfers(String id) {
+        if (!existsUserAccount(id))
+            throw new UserDoesNotExistException(id);
         return transactionRepository.getByFromOrTo(id, id);
     }
 

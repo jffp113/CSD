@@ -32,7 +32,7 @@ public class WalletRelatedCommandsImpl {
 
     private String tryToCreateMoney (String toUser, long amount) throws ServerAnswerException {
         client.createMoney(toUser,amount);
-        return "Money was created with success";
+        return "Money created successfully";
     }
 
     @ShellMethod("Transfer money from a provided user to other provided user")
@@ -47,7 +47,7 @@ public class WalletRelatedCommandsImpl {
 
     private String tryToTransferMoney (String fromUser, String toUser, long amount) throws ServerAnswerException {
         client.transferMoney(fromUser, toUser, amount);
-        return "Money was transfer";
+        return "Money was transfer.";
     }
 
     @ShellMethod("See the provided user money")
@@ -55,8 +55,7 @@ public class WalletRelatedCommandsImpl {
         try {
             return tryToCurrentAmount(id);
         } catch (ServerAnswerException e) {
-            return
-                    e.getMessage();
+            return e.getMessage();
         }
     }
 
@@ -93,8 +92,9 @@ public class WalletRelatedCommandsImpl {
                 client.LedgerOfClientTransfers(id));
     }
 
-
-    public String transformListOfTransactionInString(List<Transaction> transactionsList){
+    private String transformListOfTransactionInString(List<Transaction> transactionsList){
+        if (transactionsList.isEmpty())
+            return "No transactions performed.";
         StringBuffer stringBuffer = new StringBuffer();
         stringBuffer.append("Ledger:\n");
 

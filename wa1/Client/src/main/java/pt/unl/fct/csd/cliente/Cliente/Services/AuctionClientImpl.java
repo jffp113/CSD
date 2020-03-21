@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -32,10 +33,10 @@ public class AuctionClientImpl implements AuctionClient {
     	CREATE_AUCTION("/create/%s"),
     	CREATE_BID("/create/bid"),
     	TERMINATE_AUCTION("/terminate/%s"),
-    	GET_CLOSE_BID("/%l/closebid"),
+    	GET_CLOSE_BID("/%d/closebid"),
     	GET_OPEN_AUCTIONS("/open"),
     	GET_CLOSED_AUCTIONS("/closed"),
-    	GET_AUCTION_BIDS("/%l/bids"),
+    	GET_AUCTION_BIDS("/%d/bids"),
     	GET_CLIENT_BIDS("/client/%s");
     	
     	private static final String BASE_URL = "/auctions";
@@ -76,39 +77,30 @@ public class AuctionClientImpl implements AuctionClient {
 	}
 
 	@Override
-	public void terminateAuction(long auctionId) {
+	public void terminateAuction(long auctionId) throws ServerAnswerException {
 		String urlWithId = String.format(Path.TERMINATE_AUCTION.url, BASE, auctionId);
-		restTemplate.put(urlWithId, null);	//TODO CHECK THIS ONE ERROR HANDLING
+		//restTemplate.put(urlWithId, null);	//TODO CHECK THIS ONE ERROR HANDLING
+		ResponseEntity<String> response =
+				restTemplate.exchange(urlWithId, HttpMethod.PUT, null, String.class);
+		new HandleServerAnswer<Void>().processServerAnswer(response, Void.class);
 	}
 
 	@Override
 	public List<Auction> getOpenAuctions() throws ServerAnswerException {
 		String urlComplete = String.format(Path.GET_OPEN_AUCTIONS.url, BASE);
 		return new ListObjects<Auction>().getListFromUrl(urlComplete, Auction[].class);
-		//Auction[] auctions = restTemplate.
-		//		getForEntity(urlComplete, Auction[].class).
-		//		getBody();
-		//return Arrays.asList(auctions);
 	}
 
 	@Override
 	public List<Auction> getClosedAuctions() throws ServerAnswerException {
 		String urlComplete = String.format(Path.GET_CLOSED_AUCTIONS.url, BASE);
 		return new ListObjects<Auction>().getListFromUrl(urlComplete, Auction[].class);
-		//Auction[] auctions = restTemplate.
-		//		getForEntity(urlComplete, Auction[].class).
-		//		getBody();
-		//return Arrays.asList(auctions);
 	}
 
 	@Override
 	public List<Bid> getAuctionBids(long auctionId) throws ServerAnswerException {
 		String urlComplete = String.format(Path.GET_AUCTION_BIDS.url, BASE, auctionId);
 		return new ListObjects<Bid>().getListFromUrl(urlComplete, Bid[].class);
-		/*Bid[] bids = restTemplate.
-				getForEntity(urlComplete, Bid[].class).
-				getBody();
-		return Arrays.asList(bids);*/
 	}
 
 	@Override
@@ -141,7 +133,7 @@ public class AuctionClientImpl implements AuctionClient {
 
     	private List<E> getListFromUrl (String url, Class<E[]> klass) throws ServerAnswerException {
     		ResponseEntity<String> response =
-					restTemplate.getForEntity(url, null, String.class);
+					restTemplate.getForEntity(url, String.class);
     		E[] elements = new HandleServerAnswer<E[]>().processServerAnswer(response, klass);
     		return Arrays.asList(elements);
 		}

@@ -33,8 +33,8 @@ public class AuctionRelatedCommandsImpl {
     }
 
     private String tryToCreateAuction (String toUser) throws ServerAnswerException {
-        client.createAuction(toUser);
-        return "Auction was created with success";
+        Long auctionId = client.createAuction(toUser);
+        return String.format("Auction with id %d was created with success", auctionId);
     }
 
     @ShellMethod("Lists the bids from an auction")
@@ -66,10 +66,12 @@ public class AuctionRelatedCommandsImpl {
     }
     
     private String listBids(List<Bid> bids) {
+        if (bids.isEmpty())
+            return "No bids to present";
     	StringBuffer stringBuffer = new StringBuffer();
         stringBuffer.append("Auction Bids:\n");
         for (Bid bid : bids) {
-        	String toPrint = String.format("Bid from %s with amount %d\n", 
+        	String toPrint = String.format("Bid from %s with the amount %d\n",
         			bid.getBidderId(), bid.getValue());
         	stringBuffer.append(toPrint);
         }
@@ -105,6 +107,8 @@ public class AuctionRelatedCommandsImpl {
     }
     
     private String listAuctions(List<Auction> auctions) {
+        if (auctions.isEmpty())
+            return "No auctions to present.";
     	StringBuffer stringBuffer = new StringBuffer();
         stringBuffer.append("Auctions:\n");
         for (Auction auction : auctions) {
@@ -117,10 +121,14 @@ public class AuctionRelatedCommandsImpl {
 
     @ShellMethod("Terminates an auction")
     public String terminateAuction( @ShellOption() long auctionId) {
-        return tryToTerminateAuction(auctionId);
+        try {
+            return tryToTerminateAuction(auctionId);
+        } catch (ServerAnswerException e) {
+            return e.getMessage();
+        }
     }
 
-    private String tryToTerminateAuction(long auctionId) {
+    private String tryToTerminateAuction(long auctionId) throws ServerAnswerException {
         client.terminateAuction(auctionId);
         return "Auction was terminated with success";
     }
@@ -136,7 +144,7 @@ public class AuctionRelatedCommandsImpl {
 
     private String tryToGetCloseBid (long auctionId) throws ServerAnswerException {
         Bid bid = client.getClosedBid(auctionId);
-        return "Auction was by the bid: " + bid.getAuctionId();
+        return "Auction was closed by the bid: " + bid.getAuctionId();
     }
 
     @ShellMethod("Create a bid in a specified auction with a determinated amount from a certrain user")

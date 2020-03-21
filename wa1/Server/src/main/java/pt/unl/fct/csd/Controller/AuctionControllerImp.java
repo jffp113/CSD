@@ -69,17 +69,22 @@ public class AuctionControllerImp implements AuctionController {
 
 	@Override
 	public List<Bid> getAuctionBids(long auctionId) {
+		getAuction(auctionId);
 		return bidRepository.getAllByAuctionId(auctionId);
 	}
 
 	@Override
 	public List<Bid> getClientBids(String clientId) {
+		if (!existsUserAccount(clientId))
+			throw new UserDoesNotExistException(clientId);
 		return bidRepository.getAllByBidderId(clientId);
 	}
 
 	@Override
 	public Bid getCloseBid(long auctionId) {
 		Auction auction = getAuction(auctionId);
+		if (!auction.isAuctionClosed())
+			throw new AuctionIsNotClosedException(auctionId);
 		Long bidId = auction.getLastBid();
 		return getBid(bidId);
 	}
@@ -105,6 +110,8 @@ public class AuctionControllerImp implements AuctionController {
 	}
 
 	private void bidConsistencyChecks(UserAccount bidder, Bid newBid, Auction auction) {
+		if (newBid.getValue() <= 0)
+			throw new BidAmountIsInvalidException();
 		if (!doesUserHaveEnoughMoney(bidder, newBid))
 			throw new UserDoesNotHaveTheMoneyToMakeBidException(bidder.getId(), newBid.getValue());
 		if (auction.isAuctionClosed())
