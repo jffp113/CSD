@@ -3,6 +3,7 @@ package pt.unl.fct.csd;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
@@ -37,8 +38,9 @@ class WalletTests {
     private ObjectMapper objectMapper;
 
     //test "subjects"
+    @Qualifier("ImpWalletReplicator")
     @Autowired
-    private WalletController walletController;
+    private WalletController WalletController;
     @Autowired
     private UserAccountRepository userRepository;
 
@@ -46,7 +48,7 @@ class WalletTests {
     void contextLoads() {
         assertThat(mockMvc).isNotNull();
         assertThat(objectMapper).isNotNull();
-        assertThat(walletController).isNotNull();
+        assertThat(WalletController).isNotNull();
         assertThat(userRepository).isNotNull();
     }
 
@@ -248,29 +250,29 @@ class WalletTests {
 
 
     private ResultActions performCreateMoney(Transaction transaction) throws Exception {
-        return mockMvc.perform(post(walletController.BASE_URL + walletController.CREATE_MONEY)
+        return mockMvc.perform(post(WalletController.BASE_URL + WalletController.CREATE_MONEY)
                 .contentType(APPLICATION_JSON_VALUE)
                 .content(objectMapper.writeValueAsString(transaction)));
     }
 
     private ResultActions performTransferMoney(Transaction transaction) throws Exception {
-        return mockMvc.perform(post(walletController.BASE_URL + walletController.TRANSFER_MONEY)
+        return mockMvc.perform(post(WalletController.BASE_URL + WalletController.TRANSFER_MONEY)
                 .contentType(APPLICATION_JSON_VALUE)
                 .content(objectMapper.writeValueAsString(transaction)));
     }
 
     private ResultActions performGetCurrentAmount(String username) throws Exception {
-        return mockMvc.perform(get(walletController.BASE_URL + walletController.GET_MONEY, username)
+        return mockMvc.perform(get(WalletController.BASE_URL + WalletController.GET_MONEY, username)
                 .contentType(APPLICATION_JSON_VALUE));
     }
 
     private ResultActions performGetClientLedger(String username) throws Exception {
-        return mockMvc.perform(get(walletController.BASE_URL + walletController.GET_CLIENT_LEDGER, username)
+        return mockMvc.perform(get(WalletController.BASE_URL + WalletController.GET_CLIENT_LEDGER, username)
                 .contentType(APPLICATION_JSON_VALUE));
     }
 
     private ResultActions performGetLedger() throws Exception {
-        return mockMvc.perform(get(walletController.BASE_URL + walletController.GET_LEDGER)
+        return mockMvc.perform(get(WalletController.BASE_URL + WalletController.GET_LEDGER)
                 .contentType(APPLICATION_JSON_VALUE));
     }
 

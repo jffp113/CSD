@@ -8,8 +8,7 @@ import java.util.List;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
-@RestController
-@RequestMapping(value = WalletController.BASE_URL)
+
 public interface WalletController {
 
     String BASE_URL = "/money";

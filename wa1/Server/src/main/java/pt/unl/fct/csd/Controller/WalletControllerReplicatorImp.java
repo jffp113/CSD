@@ -1,46 +1,64 @@
 package pt.unl.fct.csd.Controller;
 
 import bftsmart.tom.ServiceProxy;
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pt.unl.fct.csd.Model.Transaction;
 import pt.unl.fct.csd.Model.UserAccount;
 
+import java.util.List;
+
 @PropertySource("classpath:application.properties")
-@RestController
-public class WalletControllerReplicatorImp extends WalletControllerImp {
+@RestController("ImpWalletReplicator")
+@RequestMapping(value = WalletController.BASE_URL)
+public class WalletControllerReplicatorImp implements WalletController {
     private final Logger logger =
             LoggerFactory.getLogger(WalletControllerReplicatorImp.class);
 
     @Autowired
     ServiceProxy serviceProxy;
 
+    @Qualifier("ImpWallet")
+    @Autowired
+    WalletController walletController;
+
     @Override
-    public void createMoney(Transaction transaction){
-        //TODO
-        super.createMoney(transaction);
+    public void createMoney(Transaction transaction) {
+        walletController.createMoney(transaction);
     }
 
     @Override
     public void transferMoneyBetweenUsers(Transaction transaction) {
-        //TODO
-        super.transferMoneyBetweenUsers(transaction);
+        walletController.transferMoneyBetweenUsers(transaction);
     }
 
     @Override
-    public void removeMoney(@NotNull UserAccount user, long amount) {
-        //TODO
-        super.removeMoney(user, amount);
+    public Long currentAmount(String id) {
+        return walletController.currentAmount(id);
     }
 
     @Override
-    public void addMoney(@NotNull UserAccount user, long amount) {
-        //TODO
-        super.addMoney(user, amount);
+    public List<Transaction> ledgerOfClientTransfers() {
+        return walletController.ledgerOfClientTransfers();
+    }
+
+    @Override
+    public List<Transaction> ledgerOfClientTransfers(String id) {
+        return walletController.ledgerOfClientTransfers(id);
+    }
+
+    @Override
+    public void removeMoney(UserAccount user, long amount) {
+        walletController.removeMoney(user,amount);
+    }
+
+    @Override
+    public void addMoney(UserAccount user, long amount) {
+        walletController.addMoney(user,amount);
     }
 }

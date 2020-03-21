@@ -9,8 +9,7 @@ import java.util.List;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
-@RestController
-@RequestMapping(value = AuctionController.BASE_URL)
+
 public interface AuctionController {
 
     String BASE_URL = "/auctions";

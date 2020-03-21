@@ -3,7 +3,8 @@ package pt.unl.fct.csd.Controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
 import pt.unl.fct.csd.Exceptions.*;
 import pt.unl.fct.csd.Model.Auction;
 import pt.unl.fct.csd.Model.Bid;
@@ -16,6 +17,7 @@ import pt.unl.fct.csd.Repository.UserAccountRepository;
 import java.util.List;
 import java.util.Optional;
 
+@Service("ImpAuction")
 public class AuctionControllerImp implements AuctionController {
 
     private final Logger logger =
@@ -30,8 +32,9 @@ public class AuctionControllerImp implements AuctionController {
     @Autowired
     private UserAccountRepository userAccountRepository;
 
+    @Qualifier("ImpWalletReplicator")
     @Autowired
-    private WalletController walletControllerReplicatorImp;
+    private WalletController walletController;
 
 	@Override
 	public Long createAuction(String ownerId) {
@@ -148,11 +151,11 @@ public class AuctionControllerImp implements AuctionController {
 		Transaction t = new Transaction();
 		t.setTo(bidder);
 		t.setAmount(amount);
-		walletControllerReplicatorImp.createMoney(t);
+		walletController.createMoney(t);
 	}
 
 	private void removeMoneyFromBid(UserAccount bidder, long bidValue) {
-		walletControllerReplicatorImp.removeMoney(bidder, bidValue);
+		walletController.removeMoney(bidder, bidValue);
 	}
 
 	/**************************************************************/

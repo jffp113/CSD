@@ -5,6 +5,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
+import pt.unl.fct.csd.Controller.WalletController;
+import pt.unl.fct.csd.Controller.WalletControllerImp;
 
 @PropertySource("classpath:application.properties")
 @Configuration
@@ -17,4 +19,5 @@ import org.springframework.context.annotation.PropertySource;
      public ServiceProxy serviceProxy() {
          return new ServiceProxy(ID);
      }
+
  }

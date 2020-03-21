@@ -4,7 +4,7 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.stereotype.Service;
 import pt.unl.fct.csd.Exceptions.*;
 import pt.unl.fct.csd.Model.Transaction;
 import pt.unl.fct.csd.Model.UserAccount;
@@ -14,7 +14,7 @@ import pt.unl.fct.csd.Repository.UserAccountRepository;
 import java.util.List;
 import java.util.Optional;
 
-
+@Service("ImpWallet")
 public class WalletControllerImp implements WalletController {
 
     public static final String SYSTEM_RESERVED_USER = "SYSTEM";
