@@ -5,8 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
-import pt.unl.fct.csd.Exceptions.ResourceDoesNotExistException;
-import pt.unl.fct.csd.Exceptions.InvalidOperationException;
+import pt.unl.fct.csd.Exceptions.*;
 import pt.unl.fct.csd.Model.Transaction;
 import pt.unl.fct.csd.Model.UserAccount;
 import pt.unl.fct.csd.Repository.TransactionRepository;
@@ -32,66 +31,56 @@ public class WalletControllerImp implements WalletController {
     public void createMoney(Transaction transaction) {
 
         if (transaction.getAmount() < 0 || transaction.getTo().equals(SYSTEM_RESERVED_USER)) {
-            throw new InvalidOperationException();
+            throw new TransactionAmountNotValidException();
         }
 
-        UserAccount account = userAccountRepository.findById(transaction.getTo())
-                .orElse(new UserAccount(transaction.getTo(), 0L));
-
+        UserAccount account = getOrCreateUser(transaction.getTo());
         account.addMoney(transaction.getAmount());
-
-        userAccountRepository.save(account);
+        saveUser(account);
         transaction.setFrom(SYSTEM_RESERVED_USER);
         transactionRepository.save(transaction);
     }
 
+    private UserAccount getOrCreateUser (String userId) {
+        try {
+            //return new UserCommonsImpl().getUserAccount(userId);
+            return getUserAccount(userId);
+        } catch (UserDoesNotExistException e) {
+            return new UserAccount(userId, 0L);
+        }
+    }
+
     @Override
     public void transferMoneyBetweenUsers(Transaction transaction) {
-        if (!isTransferValid(transaction)) {
-            throw new InvalidOperationException();
-        }
+        if (!isTransferAmountValid(transaction.getAmount()))
+            throw new TransactionAmountNotValidException();
 
-        UserAccount userFrom = getUserOrException(transaction.getFrom());
-        UserAccount userTo = getUserOrException(transaction.getTo());
+        UserAccount userFrom = getUser(transaction.getFrom());
+        if (userFrom.getMoney() < transaction.getAmount())
+            throw new InsufficientFundsForTransactionException(userFrom.getId(),
+                    userFrom.getMoney(), transaction.getAmount());
 
-        if (userFrom.getMoney() < transaction.getAmount()) {
-            throw new InvalidOperationException();
-        }
-
+        UserAccount userTo = getUser(transaction.getTo());
         userFrom.addMoney(transaction.getAmount() * -1);
         userTo.addMoney(transaction.getAmount());
 
-        userAccountRepository.save(userFrom);
-        userAccountRepository.save(userTo);
+        saveUser(userFrom);
+        saveUser(userTo);
         transactionRepository.save(transaction);
-    }
-
-    private boolean isTransferValid(Transaction transaction) {
-        return isTransferAmountValid(transaction.getAmount()) && !doesTransferInvolveSystem(transaction);
     }
 
     private boolean isTransferAmountValid(Long amount) {
         return amount != null && amount > 0;
     }
 
-    private boolean doesTransferInvolveSystem(Transaction transaction) {
-        return transaction.getTo().equals(SYSTEM_RESERVED_USER) ||
-                transaction.getFrom().equals(SYSTEM_RESERVED_USER);
-    }
-
     @Override
     public Long currentAmount(String id) {
-        return getUserOrException(id).getMoney();
+        return getUser(id).getMoney();
     }
 
-    private UserAccount getUserOrException(String id) {
-        Optional<UserAccount> user = userAccountRepository.findById(id);
-
-        if (!user.isPresent()) {
-            throw new ResourceDoesNotExistException();
-        }
-
-        return user.get();
+    private UserAccount getUser(String userId) {
+        //return new UserCommonsImpl().getUserAccount(userId);
+        return getUserAccount(userId);
     }
 
     @Override
@@ -101,6 +90,8 @@ public class WalletControllerImp implements WalletController {
 
     @Override
     public List<Transaction> ledgerOfClientTransfers(String id) {
+        if (!existsUserAccount(id))
+            throw new UserDoesNotExistException(id);
         return transactionRepository.getByFromOrTo(id, id);
     }
 
@@ -108,14 +99,19 @@ public class WalletControllerImp implements WalletController {
     public void removeMoney(@NotNull UserAccount user, long amount) {
         transferMoney(user.getId(), SYSTEM_RESERVED_USER, amount);
         user.addMoney(-1 * amount);
-        userAccountRepository.save(user);
+        saveUser(user);
     }
 
     @Override
     public void addMoney(@NotNull UserAccount user, long amount) {
         transferMoney(SYSTEM_RESERVED_USER, user.getId(), amount);
         user.addMoney(amount);
-        userAccountRepository.save(user);
+        saveUser(user);
+    }
+
+    private void saveUser(UserAccount user) {
+        //new UserCommonsImpl().saveUserInDB(user);
+        saveUserInDB(user);
     }
 
     private void transferMoney(String from, String to, Long amount) {
@@ -124,5 +120,25 @@ public class WalletControllerImp implements WalletController {
         t.setTo(to);
         t.setAmount(amount);
         transactionRepository.save(t);
+    }
+
+    /**********************************************************/
+
+    public boolean existsUserAccount(String userId) {
+        try {
+            getUserAccount(userId);
+            return true;
+        } catch (UserDoesNotExistException e) {
+            return false;
+        }
+    }
+
+    public UserAccount getUserAccount(String userId) throws UserDoesNotExistException{
+        Optional<UserAccount> user = userAccountRepository.findById(userId);
+        return user.orElseThrow(() -> new UserDoesNotExistException(userId));
+    }
+
+    public void saveUserInDB(UserAccount user) {
+        userAccountRepository.save(user);
     }
 }

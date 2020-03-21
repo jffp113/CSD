@@ -1,17 +1,13 @@
 package pt.unl.fct.csd.Controller;
 
 import bftsmart.tom.ServiceProxy;
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RestController;
 import pt.unl.fct.csd.Model.Bid;
-import pt.unl.fct.csd.Model.Transaction;
-import pt.unl.fct.csd.Model.UserAccount;
 
 @PropertySource("classpath:application.properties")
 @RestController
@@ -26,9 +22,9 @@ public class AuctionControllerReplicatorImp extends AuctionControllerImp {
     ServiceProxy serviceProxy;
 
     @Override
-    public void createAuction(String ownerId) {
+    public Long createAuction(String ownerId) {
         //TODO
-        super.createAuction(ownerId);
+        return super.createAuction(ownerId);
     }
 
     @Override
@@ -38,8 +34,8 @@ public class AuctionControllerReplicatorImp extends AuctionControllerImp {
     }
 
     @Override
-    public void makeBid(Bid newBid) {
+    public Long makeBid(Bid newBid) {
         //TODO
-        super.makeBid(newBid);
+        return super.makeBid(newBid);
     }
 }
