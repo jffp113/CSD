@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.Optional;
 
 
-@RestController
 public class WalletControllerImp implements WalletController {
 
     public static final String SYSTEM_RESERVED_USER = "SYSTEM";

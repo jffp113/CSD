@@ -16,9 +16,7 @@ import pt.unl.fct.csd.Repository.UserAccountRepository;
 import java.util.List;
 import java.util.Optional;
 
-import static pt.unl.fct.csd.Controller.WalletControllerImp.SYSTEM_RESERVED_USER;
 
-@RestController
 public class AuctionControllerImp implements AuctionController {
 
     private final Logger logger =
@@ -34,7 +32,7 @@ public class AuctionControllerImp implements AuctionController {
     private BidRepository bidRepository;
 
     @Autowired
-    private WalletControllerImp walletControllerImp;
+    private WalletController walletControllerReplicatorImp;
 
 	@Override
 	public void createAuction(String ownerId) {
@@ -146,11 +144,11 @@ public class AuctionControllerImp implements AuctionController {
 		Transaction t = new Transaction();
 		t.setTo(bidder);
 		t.setAmount(amount);
-		walletControllerImp.createMoney(t);
+		walletControllerReplicatorImp.createMoney(t);
 	}
 
 	private void removeMoneyFromBid(UserAccount bidder, long bidValue) {
-		walletControllerImp.removeMoney(bidder, bidValue);
+		walletControllerReplicatorImp.removeMoney(bidder, bidValue);
 	}
 
 }
