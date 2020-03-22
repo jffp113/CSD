@@ -1,6 +1,6 @@
 package pt.unl.fct.csd.Replication;
 
-enum Path {
+public enum Path {
         CREATE_AUCTION,
         CREATE_BID_AUCTION,
         TERMINATE_AUCTION,
@@ -12,6 +12,8 @@ enum Path {
 
         CREATE_MONEY,
         TRANSFER_MONEY,
+        REMOVE_MONEY,
+        ADD_MONEY,
         GET_MONEY,
         GET_LEDGER,
         GET_CLIENT_LEDGER;

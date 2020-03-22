@@ -1,10 +1,11 @@
 package pt.unl.fct.csd.Model;
 
 import javax.persistence.*;
+import java.io.Serializable;
 
 @Entity
 @Table
-public class Auction {
+public class Auction implements Serializable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)

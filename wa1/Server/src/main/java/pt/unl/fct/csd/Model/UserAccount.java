@@ -1,10 +1,11 @@
 package pt.unl.fct.csd.Model;
 
 import javax.persistence.*;
+import java.io.Serializable;
 
 @Entity
 @Table
-public class UserAccount {
+public class UserAccount implements Serializable {
 
     @Id
     private String id;

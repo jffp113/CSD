@@ -1,6 +1,5 @@
 package pt.unl.fct.csd.Controller;
 
-import bftsmart.tom.ServiceProxy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +9,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pt.unl.fct.csd.Model.Transaction;
 import pt.unl.fct.csd.Model.UserAccount;
-
+import pt.unl.fct.csd.Replication.ClientReplicator;
+import pt.unl.fct.csd.Replication.DualArgReplication;
+import pt.unl.fct.csd.Replication.Path;
 import java.util.List;
 
 @PropertySource("classpath:application.properties")
@@ -21,7 +22,7 @@ public class WalletControllerReplicatorImp implements WalletController {
             LoggerFactory.getLogger(WalletControllerReplicatorImp.class);
 
     @Autowired
-    ServiceProxy serviceProxy;
+    ClientReplicator clientReplicator;
 
     @Qualifier("ImpWallet")
     @Autowired
@@ -29,12 +30,35 @@ public class WalletControllerReplicatorImp implements WalletController {
 
     @Override
     public void createMoney(Transaction transaction) {
-        walletController.createMoney(transaction);
+        clientReplicator.invokeReplication(transaction,Path.CREATE_AUCTION, ()-> {
+                    walletController.createMoney(transaction);
+                    return null;});
     }
+
 
     @Override
     public void transferMoneyBetweenUsers(Transaction transaction) {
-        walletController.transferMoneyBetweenUsers(transaction);
+        clientReplicator.invokeReplication(transaction,Path.TRANSFER_MONEY,() -> {
+            walletController.transferMoneyBetweenUsers(transaction);
+            return null;
+        });
+
+    }
+
+    @Override
+    public void removeMoney(UserAccount user, long amount) {
+        clientReplicator.invokeReplication(new DualArgReplication<UserAccount,Long>(user,amount),Path.REMOVE_MONEY,()->{
+            walletController.removeMoney(user,amount);
+            return null;
+        });
+    }
+
+    @Override
+    public void addMoney(UserAccount user, long amount) {
+        clientReplicator.invokeReplication(new DualArgReplication<UserAccount,Long>(user,amount),Path.ADD_MONEY,()->{
+            walletController.addMoney(user,amount);
+            return null;
+        });
     }
 
     @Override
@@ -52,13 +76,6 @@ public class WalletControllerReplicatorImp implements WalletController {
         return walletController.ledgerOfClientTransfers(id);
     }
 
-    @Override
-    public void removeMoney(UserAccount user, long amount) {
-        walletController.removeMoney(user,amount);
-    }
 
-    @Override
-    public void addMoney(UserAccount user, long amount) {
-        walletController.addMoney(user,amount);
-    }
+
 }
