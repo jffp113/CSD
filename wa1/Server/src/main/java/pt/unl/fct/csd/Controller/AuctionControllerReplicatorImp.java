@@ -1,17 +1,15 @@
 package pt.unl.fct.csd.Controller;
 
-import bftsmart.tom.ServiceProxy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pt.unl.fct.csd.Model.Auction;
 import pt.unl.fct.csd.Model.Bid;
 import pt.unl.fct.csd.Replication.ClientReplicator;
+import pt.unl.fct.csd.Replication.Path;
 
 import java.util.List;
 
@@ -31,17 +29,24 @@ public class AuctionControllerReplicatorImp implements AuctionController {
 
     @Override
     public Long createAuction(String ownerId) {
-        return auctionController.createAuction(ownerId);
+        return clientReplicator.
+                invokeReplication(ownerId, Path.CREATE_AUCTION,
+                        ()-> auctionController.createAuction(ownerId));
     }
 
     @Override
     public void terminateAuction(long auctionId) {
-        auctionController.terminateAuction(auctionId);
+        clientReplicator.
+                invokeReplication(auctionId, Path.TERMINATE_AUCTION,()-> {
+                    auctionController.terminateAuction(auctionId);
+                    return null;
+                });
     }
 
     @Override
     public Long makeBid(Bid bid) {
-        return auctionController.makeBid(bid);
+        return clientReplicator.
+                invokeReplication(bid, Path.CREATE_BID_AUCTION,()-> auctionController.makeBid(bid));
     }
 
     @Override
