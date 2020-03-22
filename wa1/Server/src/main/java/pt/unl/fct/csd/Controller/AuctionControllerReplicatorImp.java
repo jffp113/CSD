@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pt.unl.fct.csd.Model.Auction;
 import pt.unl.fct.csd.Model.Bid;
+import pt.unl.fct.csd.Replication.ClientReplicator;
 
 import java.util.List;
 
@@ -22,7 +23,7 @@ public class AuctionControllerReplicatorImp implements AuctionController {
             LoggerFactory.getLogger(AuctionControllerReplicatorImp.class);
 
     @Autowired
-    ServiceProxy serviceProxy;
+    ClientReplicator clientReplicator;
 
     @Qualifier("ImpAuction")
     @Autowired
@@ -36,6 +37,11 @@ public class AuctionControllerReplicatorImp implements AuctionController {
     @Override
     public void terminateAuction(long auctionId) {
         auctionController.terminateAuction(auctionId);
+    }
+
+    @Override
+    public Long makeBid(Bid bid) {
+        return auctionController.makeBid(bid);
     }
 
     @Override
@@ -61,10 +67,5 @@ public class AuctionControllerReplicatorImp implements AuctionController {
     @Override
     public Bid getCloseBid(long auctionId) {
         return auctionController.getCloseBid(auctionId);
-    }
-
-    @Override
-    public Long makeBid(Bid bid) {
-        return auctionController.makeBid(bid);
     }
 }
