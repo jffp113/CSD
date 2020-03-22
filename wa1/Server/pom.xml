@@ -17,28 +17,34 @@
 	<properties>
 		<java.version>1.8</java.version>
 	</properties>
+	<repositories>
 
+		<repository>
+			<id>CSD</id>
+			<url>https://pkgs.dev.azure.com/jfpereira/Teste/_packaging/CSD/maven/v1</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</repository>
+	</repositories>
 	<dependencies>
 		<dependency>
 			<groupId>bftsmart</groupId>
 			<artifactId>bftsmart</artifactId>
 			<version>1.0</version>
-			<scope>system</scope>
-			<systemPath>${project.basedir}/bin/BFT-SMaRt.jar</systemPath>
 		</dependency>
 		<dependency>
 			<groupId>commonsCoded</groupId>
 			<artifactId>commonsCoded</artifactId>
 			<version>1.5</version>
-			<scope>system</scope>
-			<systemPath>${project.basedir}/lib/commons-codec-1.5.jar</systemPath>
 		</dependency>
 		<dependency>
 			<groupId>core</groupId>
 			<artifactId>core</artifactId>
 			<version>0.1.4</version>
-			<scope>system</scope>
-			<systemPath>${project.basedir}/lib/core-0.1.4.jar</systemPath>
 		</dependency>
 
 		<dependency>
@@ -46,6 +52,7 @@
 			<artifactId>netty-all</artifactId>
 			<version>4.1.48.Final</version>
 		</dependency>
+
 	<dependency>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-data-jpa</artifactId>
@@ -102,7 +109,17 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>repackage</id>
+						<configuration>
+							<classifier>exec</classifier>
+						</configuration>
+					</execution>
+				</executions>
 			</plugin>
+
+
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -110,8 +127,12 @@
 					<source>11</source>
 					<target>11</target>
 				</configuration>
+
 			</plugin>
+
 		</plugins>
+
 	</build>
 
 </project>
+

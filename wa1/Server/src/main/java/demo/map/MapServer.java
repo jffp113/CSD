@@ -16,6 +16,7 @@ import java.util.logging.Logger;
 import bftsmart.tom.MessageContext;
 import bftsmart.tom.ServiceReplica;
 import bftsmart.tom.server.defaultservices.DefaultSingleRecoverable;
+import org.springframework.http.ResponseEntity;
 
 public class MapServer<K, V> extends DefaultSingleRecoverable {
 
