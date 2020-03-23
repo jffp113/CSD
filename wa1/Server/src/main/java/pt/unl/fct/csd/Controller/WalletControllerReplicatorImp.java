@@ -11,6 +11,7 @@ import pt.unl.fct.csd.Model.Transaction;
 import pt.unl.fct.csd.Model.UserAccount;
 import pt.unl.fct.csd.Replication.ClientReplicator;
 import pt.unl.fct.csd.Replication.DualArgReplication;
+import pt.unl.fct.csd.Replication.InvokerWrapper;
 import pt.unl.fct.csd.Replication.Path;
 import java.util.List;
 
@@ -30,52 +31,44 @@ public class WalletControllerReplicatorImp implements WalletController {
 
     @Override
     public void createMoney(Transaction transaction) {
-        clientReplicator.invokeReplication(transaction,Path.CREATE_AUCTION, ()-> {
-                    walletController.createMoney(transaction);
-                    return null;});
+        InvokerWrapper<Exception> result =
+                clientReplicator.invokeReplication(transaction,Path.CREATE_AUCTION);
+        result.getResultOrThrow();
     }
 
 
     @Override
     public void transferMoneyBetweenUsers(Transaction transaction) {
-        clientReplicator.invokeReplication(transaction,Path.TRANSFER_MONEY,() -> {
-            walletController.transferMoneyBetweenUsers(transaction);
-            return null;
-        });
+        clientReplicator.invokeReplication(transaction,Path.TRANSFER_MONEY);
 
     }
 
     @Override
     public void removeMoney(UserAccount user, long amount) {
-        clientReplicator.invokeReplication(new DualArgReplication<UserAccount,Long>(user,amount),Path.REMOVE_MONEY,()->{
-            walletController.removeMoney(user,amount);
-            return null;
-        });
+        clientReplicator.invokeReplication(new DualArgReplication<UserAccount,Long>(user,amount),Path.REMOVE_MONEY);
     }
 
     @Override
     public void addMoney(UserAccount user, long amount) {
-        clientReplicator.invokeReplication(new DualArgReplication<UserAccount,Long>(user,amount),Path.ADD_MONEY,()->{
-            walletController.addMoney(user,amount);
-            return null;
-        });
+        clientReplicator.invokeReplication(new DualArgReplication<UserAccount,Long>(user,amount),Path.ADD_MONEY);
     }
 
     @Override
     public Long currentAmount(String id) {
+        //TODO
         return walletController.currentAmount(id);
     }
 
     @Override
     public List<Transaction> ledgerOfClientTransfers() {
+        //TODO
         return walletController.ledgerOfClientTransfers();
     }
 
     @Override
     public List<Transaction> ledgerOfClientTransfers(String id) {
+        //TODO
         return walletController.ledgerOfClientTransfers(id);
     }
-
-
 
 }

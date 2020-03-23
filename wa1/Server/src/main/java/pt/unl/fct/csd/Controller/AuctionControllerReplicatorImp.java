@@ -30,23 +30,19 @@ public class AuctionControllerReplicatorImp implements AuctionController {
     @Override
     public Long createAuction(String ownerId) {
         return clientReplicator.
-                invokeReplication(ownerId, Path.CREATE_AUCTION,
-                        ()-> auctionController.createAuction(ownerId));
+                invokeReplication(ownerId, Path.CREATE_AUCTION);
     }
 
     @Override
     public void terminateAuction(long auctionId) {
         clientReplicator.
-                invokeReplication(auctionId, Path.TERMINATE_AUCTION,()-> {
-                    auctionController.terminateAuction(auctionId);
-                    return null;
-                });
+                invokeReplication(auctionId, Path.TERMINATE_AUCTION);
     }
 
     @Override
     public Long makeBid(Bid bid) {
         return clientReplicator.
-                invokeReplication(bid, Path.CREATE_BID_AUCTION,()-> auctionController.makeBid(bid));
+                invokeReplication(bid, Path.CREATE_BID_AUCTION);
     }
 
     @Override

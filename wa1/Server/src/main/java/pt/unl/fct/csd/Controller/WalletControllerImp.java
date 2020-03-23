@@ -133,7 +133,7 @@ public class WalletControllerImp implements WalletController {
         }
     }
 
-    public UserAccount getUserAccount(String userId) throws UserDoesNotExistException{
+    public UserAccount getUserAccount(String userId){
         Optional<UserAccount> user = userAccountRepository.findById(userId);
         return user.orElseThrow(() -> new UserDoesNotExistException(userId));
     }

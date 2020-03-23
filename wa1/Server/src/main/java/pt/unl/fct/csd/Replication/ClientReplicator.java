@@ -7,10 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import pt.unl.fct.csd.Controller.WalletControllerReplicatorImp;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutput;
-import java.io.ObjectOutputStream;
+import java.io.*;
 
 @Service
 public class ClientReplicator {
@@ -20,7 +17,7 @@ public class ClientReplicator {
     @Autowired
     ServiceProxy serviceProxy;
 
-    public <T,E> T invokeReplication(E object,Path path, Invoker<T> invoker){
+    public <V,E> V invokeReplication(E object,Path path){
         try (ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
              ObjectOutput objOut = new ObjectOutputStream(byteOut);) {
 
@@ -30,19 +27,20 @@ public class ClientReplicator {
             objOut.flush();
             byteOut.flush();
             serviceProxy.invokeOrdered(byteOut.toByteArray());
-            return invoker.doStuff();
 
-        } catch (IOException err) {
-            logger.error("Exception replicating " ,err.toString());
+            byte[] reply = serviceProxy.invokeUnordered(byteOut.toByteArray());
+            if (reply.length == 0)
+                return null;
+            try (ByteArrayInputStream byteIn = new ByteArrayInputStream(reply);
+                 ObjectInput objIn = new ObjectInputStream(byteIn)) {
+                return (V)objIn.readObject();
+            }
+
+
+        } catch (IOException | ClassNotFoundException e) {
+           e.printStackTrace();
         }
 
-        //serviceProxy.
-        //if (reply.length == 0)
-        //    return;
-        //try (ByteArrayInputStream byteIn = new ByteArrayInputStream(reply);
-        //     ObjectInput objIn = new ObjectInputStream(byteIn)) {
-        //    return (V)objIn.readObject();
-        //}
         return null;
     }
 
