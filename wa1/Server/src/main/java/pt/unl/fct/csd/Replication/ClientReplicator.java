@@ -18,6 +18,7 @@ public class ClientReplicator {
     ServiceProxy serviceProxy;
 
     public <V,E> V invokeReplication(E object,Path path){
+        logger.info("Start invoking replicaition");
         try (ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
              ObjectOutput objOut = new ObjectOutputStream(byteOut);) {
 
@@ -26,9 +27,11 @@ public class ClientReplicator {
 
             objOut.flush();
             byteOut.flush();
+
             serviceProxy.invokeOrdered(byteOut.toByteArray());
 
             byte[] reply = serviceProxy.invokeUnordered(byteOut.toByteArray());
+            logger.info("Reply has size: " + reply.length);
             if (reply.length == 0)
                 return null;
             try (ByteArrayInputStream byteIn = new ByteArrayInputStream(reply);

@@ -31,8 +31,9 @@ public class WalletControllerReplicatorImp implements WalletController {
 
     @Override
     public void createMoney(Transaction transaction) {
+        logger.info("Proxy received request createMoney");
         InvokerWrapper<Exception> result =
-                clientReplicator.invokeReplication(transaction,Path.CREATE_AUCTION);
+                clientReplicator.invokeReplication(transaction,Path.CREATE_MONEY);
         result.getResultOrThrow();
     }
 
@@ -40,7 +41,6 @@ public class WalletControllerReplicatorImp implements WalletController {
     @Override
     public void transferMoneyBetweenUsers(Transaction transaction) {
         clientReplicator.invokeReplication(transaction,Path.TRANSFER_MONEY);
-
     }
 
     @Override

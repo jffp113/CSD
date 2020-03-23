@@ -3,6 +3,8 @@ package pt.unl.fct.csd.Replication;
 import bftsmart.tom.MessageContext;
 import bftsmart.tom.ServiceReplica;
 import bftsmart.tom.server.defaultservices.DefaultSingleRecoverable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,6 +20,8 @@ import java.io.*;
 @PropertySource("classpath:application.properties")
 @Component
 public class Server extends DefaultSingleRecoverable implements Runnable{
+	private final Logger logger =
+			LoggerFactory.getLogger(Server.class);
 
 
 	@Value("${replica.id}")
@@ -58,13 +62,14 @@ public class Server extends DefaultSingleRecoverable implements Runnable{
 			 ObjectOutput objOut = new ObjectOutputStream(byteOut);) {
 
 			Path path = (Path)objIn.readObject();
-
+			logger.info(String.format("Searching for %s to invoke.", path));
 			switch(path){
 				case CREATE_MONEY: objOut.
 						writeObject(InvokerWrapper.catchInvocation(
 								() -> {
 									Transaction transaction = (Transaction)objIn.readObject();
 									walletController.createMoney(transaction);
+									logger.info("Successfully completed createMoney");
 									return 1;
 								}
 						));

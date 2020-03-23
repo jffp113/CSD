@@ -22,8 +22,10 @@ public class InvokerWrapper<E extends Serializable> implements Serializable{
         try{
             return new InvokerWrapper<>(invoker.doStuff());
         }catch (RuntimeException e){
+            e.printStackTrace();
             return new InvokerWrapper<>(e);
         } catch (Exception e){
+            e.printStackTrace();
             return new InvokerWrapper<>(new InternalServerError());
         }
     }
