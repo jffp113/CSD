@@ -28,9 +28,7 @@ public class ClientReplicator {
             objOut.flush();
             byteOut.flush();
 
-            serviceProxy.invokeOrdered(byteOut.toByteArray());
-
-            byte[] reply = serviceProxy.invokeUnordered(byteOut.toByteArray());
+            byte[] reply = serviceProxy.invokeOrdered(byteOut.toByteArray());
             logger.info("Reply has size: " + reply.length);
             if (reply.length == 0)
                 return null;
