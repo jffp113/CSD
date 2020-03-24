@@ -37,7 +37,7 @@ public class Server extends DefaultSingleRecoverable implements Runnable{
 
 	@PostConstruct
 	public void init(){
-		new Thread(this).start();
+		new ServiceReplica(ID, this, this);
 	}
 
 	@Override
@@ -52,7 +52,7 @@ public class Server extends DefaultSingleRecoverable implements Runnable{
 
 	@Override
 	public byte[] appExecuteUnordered(byte[] command, MessageContext messageContext) {
-		return invokeCommand(command);
+		return new byte[0];
 	}
 
 	private byte[] invokeCommand(byte[] command) {
@@ -70,7 +70,7 @@ public class Server extends DefaultSingleRecoverable implements Runnable{
 									Transaction transaction = (Transaction)objIn.readObject();
 									walletController.createMoney(transaction);
 									logger.info("Successfully completed createMoney");
-									return 1;
+									return 1L;
 								}
 						));
 			}
