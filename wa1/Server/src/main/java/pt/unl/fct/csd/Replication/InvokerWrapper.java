@@ -31,7 +31,7 @@ public class InvokerWrapper<E extends Serializable> implements Serializable{
     }
 
     public E getResultOrThrow() {
-        if(result == null || exception != null)
+        if(exception != null)
            throw exception;
 
         return result;
