@@ -13,6 +13,7 @@ import pt.unl.fct.csd.Replication.ClientReplicator;
 import pt.unl.fct.csd.Replication.InvokerWrapper;
 import pt.unl.fct.csd.Replication.Path;
 
+import java.util.Arrays;
 import java.util.List;
 
 
@@ -52,23 +53,26 @@ public class AuctionControllerReplicatorImp implements AuctionController {
 
     @Override
     public List<Auction> getOpenAuctions() {
-        InvokerWrapper<Auction[]> auctions = clientReplicator.
-                invokeReplication();
+        return new GenericListResults<Auction, Void>(clientReplicator).
+                getListWithPath(Path.GET_OPEN_AUCTIONS);
     }
 
     @Override
     public List<Auction> getClosedAuction() {
-        return auctionController.getClosedAuction();
+        return new GenericListResults<Auction, Void>(clientReplicator).
+                getListWithPath(Path.GET_CLOSED_AUCTIONS);
     }
 
     @Override
     public List<Bid> getAuctionBids(long auctionId) {
-        return auctionController.getAuctionBids(auctionId);
+        return new GenericListResults<Bid, Long>(clientReplicator).
+                getListWithPath(auctionId, Path.GET_AUCTION_BIDS);
     }
 
     @Override
     public List<Bid> getClientBids(String clientId) {
-        return auctionController.getClientBids(clientId);
+        return new GenericListResults<Bid, String>(clientReplicator).
+                getListWithPath(clientId, Path.GET_CLIENT_BIDS);
     }
 
     @Override
