@@ -17,36 +17,64 @@ public class ClientReplicator {
     @Autowired
     ServiceProxy serviceProxy;
 
-    public <V> V invokeReplication(Path path) {
-        return invokeReplication(null, path);
+    public <V> V invokeOrderedReplication(Path path) {
+        return invokeOrderedReplication(null, path);
     }
 
-    public <V,E> V invokeReplication(E object,Path path){
+    public <V,E> V invokeOrderedReplication(E object,Path path){
         logger.info("Start invoking replication");
+        byte[] replicationInput = convertInput(object, path);
+        byte[] replicationReply = serviceProxy.invokeOrdered(replicationInput);
+        return parseReplicationReply(replicationReply);
+    }
+
+    public <V> V invokeUnorderedReplication (Path path) {
+        return invokeUnorderedReplication(null, path);
+    }
+
+    public <E,V> V invokeUnorderedReplication (E object, Path path) {
+        byte[] replicationInput = convertInput(object, path);
+        byte[] replicationReply = serviceProxy.invokeUnordered(replicationInput);
+        return parseReplicationReply(replicationReply);
+    }
+
+    private <E> byte[] convertInput (E object, Path path) {
+        try {
+            return tryToConvertInput(object, path);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return new byte[0];
+        }
+    }
+
+    private <E> byte[] tryToConvertInput (E object, Path path) throws IOException {
         try (ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
-             ObjectOutput objOut = new ObjectOutputStream(byteOut);) {
+             ObjectOutput objOut = new ObjectOutputStream(byteOut)) {
 
             objOut.writeObject(path);
             objOut.writeObject(object);
 
             objOut.flush();
             byteOut.flush();
-
-            byte[] reply = serviceProxy.invokeOrdered(byteOut.toByteArray());
-            logger.info("Reply has size: " + reply.length);
-            if (reply.length == 0)
-                return null;
-            try (ByteArrayInputStream byteIn = new ByteArrayInputStream(reply);
-                 ObjectInput objIn = new ObjectInputStream(byteIn)) {
-                return (V)objIn.readObject();
-            }
-
-
-        } catch (IOException | ClassNotFoundException e) {
-           e.printStackTrace();
+            return byteOut.toByteArray();
         }
+    }
 
-        return null;
+    private <V> V parseReplicationReply (byte[] replicationReply) {
+        try {
+            return tryToParseReplicationReply(replicationReply);
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    private <V> V tryToParseReplicationReply (byte[] replicationReply)
+            throws IOException, ClassNotFoundException {
+        try (ByteArrayInputStream byteIn = new ByteArrayInputStream(replicationReply);
+             ObjectInput objIn = new ObjectInputStream(byteIn)) {
+            return (V)objIn.readObject();
+        }
     }
 
 }
