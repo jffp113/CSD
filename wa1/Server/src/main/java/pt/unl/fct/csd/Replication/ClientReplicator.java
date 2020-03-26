@@ -18,7 +18,7 @@ public class ClientReplicator {
     ServiceProxy serviceProxy;
 
     public <V,E> V invokeReplication(E object,Path path){
-        logger.info("Start invoking replicaition");
+        logger.info("Start invoking replication");
         try (ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
              ObjectOutput objOut = new ObjectOutputStream(byteOut);) {
 

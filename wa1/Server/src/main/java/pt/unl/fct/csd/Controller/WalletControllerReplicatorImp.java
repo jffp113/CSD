@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pt.unl.fct.csd.Model.Transaction;
 import pt.unl.fct.csd.Model.UserAccount;
+import pt.unl.fct.csd.Model.VoidWrapper;
 import pt.unl.fct.csd.Replication.ClientReplicator;
 import pt.unl.fct.csd.Replication.DualArgReplication;
 import pt.unl.fct.csd.Replication.InvokerWrapper;
@@ -32,7 +33,7 @@ public class WalletControllerReplicatorImp implements WalletController {
     @Override
     public void createMoney(Transaction transaction) {
         logger.info("Proxy received request createMoney");
-        InvokerWrapper<Long> result =
+        InvokerWrapper<VoidWrapper> result =
                 clientReplicator.invokeReplication(transaction,Path.CREATE_MONEY);
         result.getResultOrThrow();
     }
