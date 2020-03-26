@@ -128,7 +128,7 @@ public class Server extends DefaultSingleRecoverable implements Runnable{
 						writeObject(InvokerWrapper.catchInvocation(
 								() -> {
 									logger.info("Successfully completed ledgerOfClientTransfers");
-									return walletController.currentAmount((String)objIn.readObject());
+									return walletController.ledgerOfClientTransfers((String)objIn.readObject()).toArray();
 								}
 						));
 						break;
