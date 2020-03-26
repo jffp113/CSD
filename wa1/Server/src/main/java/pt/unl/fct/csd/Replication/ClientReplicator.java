@@ -71,6 +71,8 @@ public class ClientReplicator {
 
     private <V> V tryToParseReplicationReply (byte[] replicationReply)
             throws IOException, ClassNotFoundException {
+        if (replicationReply == null || replicationReply.length == 0)
+            return null;
         try (ByteArrayInputStream byteIn = new ByteArrayInputStream(replicationReply);
              ObjectInput objIn = new ObjectInputStream(byteIn)) {
             return (V)objIn.readObject();
