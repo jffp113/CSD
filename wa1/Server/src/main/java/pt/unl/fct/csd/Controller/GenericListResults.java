@@ -21,7 +21,7 @@ public class GenericListResults<E, V> {
 
     public List<E> getListWithPath (V args, Path path) {
         InvokerWrapper<E[]> auctions = clientReplicator.
-                invokeReplication(args, path);
+                invokeUnorderedReplication(args, path);
         return Arrays.asList(auctions.getResultOrThrow());
     }
 }
