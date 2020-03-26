@@ -77,6 +77,8 @@ public class AuctionControllerReplicatorImp implements AuctionController {
 
     @Override
     public Bid getCloseBid(long auctionId) {
-        return auctionController.getCloseBid(auctionId);
+        InvokerWrapper<Bid> bid = clientReplicator.
+                invokeUnorderedReplication(auctionId, Path.GET_CLOSE_BID);
+        return bid.getResultOrThrow();
     }
 }
