@@ -33,21 +33,21 @@ public class AuctionControllerReplicatorImp implements AuctionController {
     @Override
     public Long createAuction(String ownerId) {
         InvokerWrapper<Long> auctionId = clientReplicator.
-                invokeReplication(ownerId, Path.CREATE_AUCTION);
+                invokeOrderedReplication(ownerId, Path.CREATE_AUCTION);
         return auctionId.getResultOrThrow();
     }
 
     @Override
     public void terminateAuction(long auctionId) {
         InvokerWrapper<VoidWrapper> result = clientReplicator.
-                invokeReplication(auctionId, Path.TERMINATE_AUCTION);
+                invokeOrderedReplication(auctionId, Path.TERMINATE_AUCTION);
         result.getResultOrThrow();
     }
 
     @Override
     public Long makeBid(Bid bid) {
         InvokerWrapper<Long> bidId = clientReplicator.
-                invokeReplication(bid, Path.CREATE_BID_AUCTION);
+                invokeOrderedReplication(bid, Path.CREATE_BID_AUCTION);
         return bidId.getResultOrThrow();
     }
 
