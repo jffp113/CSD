@@ -12,7 +12,6 @@ import pt.unl.fct.csd.Model.UserAccount;
 import pt.unl.fct.csd.Model.VoidWrapper;
 import pt.unl.fct.csd.Replication.*;
 
-import java.util.Arrays;
 import java.util.List;
 
 @PropertySource("classpath:application.properties")
@@ -33,7 +32,7 @@ public class WalletControllerReplicatorImp implements WalletController {
     public void createMoney(Transaction transaction) {
         logger.info("Proxy received request createMoney");
         InvokerWrapper<VoidWrapper> result =
-                clientReplicator.invokeReplication(transaction,Path.CREATE_MONEY);
+                clientReplicator.invokeOrderedReplication(transaction,Path.CREATE_MONEY);
         result.getResultOrThrow();
     }
 
@@ -41,7 +40,7 @@ public class WalletControllerReplicatorImp implements WalletController {
     public void transferMoneyBetweenUsers(Transaction transaction) {
         logger.info("Proxy received request transferMoneyBetweenUsers");
         InvokerWrapper<VoidWrapper> result =
-            clientReplicator.invokeReplication(transaction,Path.TRANSFER_MONEY);
+            clientReplicator.invokeOrderedReplication(transaction,Path.TRANSFER_MONEY);
         result.getResultOrThrow();
     }
 
@@ -49,7 +48,7 @@ public class WalletControllerReplicatorImp implements WalletController {
     public void removeMoney(UserAccount user, long amount) {
         logger.info("Proxy received request removeMoney");
         InvokerWrapper<VoidWrapper> result =
-                clientReplicator.invokeReplication(new DualArgReplication<>(user,amount),Path.REMOVE_MONEY);
+                clientReplicator.invokeOrderedReplication(new DualArgReplication<>(user,amount),Path.REMOVE_MONEY);
         result.getResultOrThrow();
     }
 
@@ -57,31 +56,29 @@ public class WalletControllerReplicatorImp implements WalletController {
     public void addMoney(UserAccount user, long amount) {
         logger.info("Proxy received request addMoney");
         InvokerWrapper<VoidWrapper> result =
-                clientReplicator.invokeReplication(new DualArgReplication<>(user,amount),Path.ADD_MONEY);
+                clientReplicator.invokeOrderedReplication(new DualArgReplication<>(user,amount),Path.ADD_MONEY);
         result.getResultOrThrow();
     }
 
     @Override
-    public Long currentAmount(String id) {
+    public Long currentAmount(String userId) {
         logger.info("Proxy received request currentAmount");
         InvokerWrapper<Long> result=
-            clientReplicator.invokeReplication(id, Path.GET_MONEY);
+            clientReplicator.invokeUnorderedReplication(userId, Path.GET_MONEY);
         return result.getResultOrThrow();
     }
 
     @Override
     public List<Transaction> ledgerOfClientTransfers() {
         logger.info("Proxy received request ledgerOfClientTransfers");
-        InvokerWrapper<Transaction[]> result=
-                clientReplicator.invokeReplication(Path.GET_LEDGER);
-        return Arrays.asList(result.getResultOrThrow());
+        return new GenericListResults<Transaction, Void>(clientReplicator)
+                .getListWithPath(Path.GET_LEDGER);
     }
 
     @Override
-    public List<Transaction> ledgerOfClientTransfers(String id) {
+    public List<Transaction> ledgerOfClientTransfers(String userId) {
         logger.info("Proxy received request ledgerOfClientTransfers");
-        InvokerWrapper<Transaction[]> result=
-                clientReplicator.invokeReplication(id, Path.GET_CLIENT_LEDGER);
-        return Arrays.asList(result.getResultOrThrow());
+        return new GenericListResults<Transaction, String>(clientReplicator)
+                .getListWithPath(userId,Path.GET_CLIENT_LEDGER);
     }
 }
