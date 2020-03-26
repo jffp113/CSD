@@ -12,6 +12,7 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
 import pt.unl.fct.csd.Controller.AuctionController;
 import pt.unl.fct.csd.Controller.WalletController;
+import pt.unl.fct.csd.Model.Bid;
 import pt.unl.fct.csd.Model.Transaction;
 import pt.unl.fct.csd.Model.UserAccount;
 import pt.unl.fct.csd.Model.VoidWrapper;
@@ -132,6 +133,77 @@ public class Server extends DefaultSingleRecoverable implements Runnable{
 								}
 						));
 						break;
+				case CREATE_AUCTION:objOut.
+						writeObject(InvokerWrapper.catchInvocation(
+								() -> {
+									logger.info("Create auction successfully invoked");
+									String clientId = (String) objIn.readObject();
+									return auctionController.createAuction(clientId);
+								}
+						));
+					break;
+				case CREATE_BID_AUCTION: objOut.
+						writeObject(InvokerWrapper.catchInvocation(
+								() -> {
+									logger.info("Create auction bid successfully invoked");
+									Bid bid = (Bid) objIn.readObject();
+									return auctionController.makeBid(bid);
+								}
+						));
+					break;
+				case TERMINATE_AUCTION: objOut.
+						writeObject(InvokerWrapper.catchInvocation(
+								() -> {
+									logger.info("Terminate auction successfully invoked");
+									Long auctionId = (Long) objIn.readObject();
+									auctionController.terminateAuction(auctionId);
+									return new VoidWrapper();
+								}
+						));
+					break;
+				case GET_CLOSE_BID: objOut.
+						writeObject(InvokerWrapper.catchInvocation(
+								() -> {
+									logger.info("Get close bid successfully invoked");
+									Long auctionId = (Long) objIn.readObject();
+									return auctionController.getCloseBid(auctionId);
+								}
+						));
+					break;
+				case GET_OPEN_AUCTIONS: objOut.
+						writeObject(InvokerWrapper.catchInvocation(
+								() -> {
+									logger.info("Get open auctions successfully invoked");
+									return auctionController.getOpenAuctions().toArray();
+								}
+						));
+					break;
+				case GET_CLOSED_AUCTIONS: objOut.
+						writeObject(InvokerWrapper.catchInvocation(
+								() -> {
+									logger.info("Get close auctions successfully invoked");
+									return auctionController.getClosedAuction().toArray();
+								}
+						));
+					break;
+				case GET_AUCTION_BIDS: objOut.
+						writeObject(InvokerWrapper.catchInvocation(
+								() -> {
+									logger.info("Get auction bids successfully invoked");
+									Long auctionId = (Long) objIn.readObject();
+									return auctionController.getAuctionBids(auctionId).toArray();
+								}
+						));
+					break;
+				case GET_CLIENT_BIDS: objOut.
+						writeObject(InvokerWrapper.catchInvocation(
+								() -> {
+									logger.info("Get client bids successfully invoked");
+									String clientId = (String) objIn.readObject();
+									return auctionController.getClientBids(clientId).toArray();
+								}
+						));
+					break;
 				default:
 					logger.error("Not implemented");
 					break;
