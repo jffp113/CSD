@@ -13,9 +13,12 @@ import org.springframework.stereotype.Component;
 import pt.unl.fct.csd.Controller.AuctionController;
 import pt.unl.fct.csd.Controller.WalletController;
 import pt.unl.fct.csd.Model.Transaction;
+import pt.unl.fct.csd.Model.UserAccount;
+import pt.unl.fct.csd.Model.VoidWrapper;
 
 import javax.annotation.PostConstruct;
 import java.io.*;
+import java.util.Arrays;
 
 @PropertySource("classpath:application.properties")
 @Component
@@ -67,12 +70,71 @@ public class Server extends DefaultSingleRecoverable implements Runnable{
 				case CREATE_MONEY: objOut.
 						writeObject(InvokerWrapper.catchInvocation(
 								() -> {
-									Transaction transaction = (Transaction)objIn.readObject();
-									walletController.createMoney(transaction);
+									walletController.createMoney((Transaction)objIn.readObject());
 									logger.info("Successfully completed createMoney");
-									return 1L;
+									return new VoidWrapper();
 								}
 						));
+						break;
+				case TRANSFER_MONEY: objOut.
+						writeObject(InvokerWrapper.catchInvocation(
+								() -> {
+									walletController.transferMoneyBetweenUsers((Transaction)objIn.readObject());
+									logger.info("Successfully completed transferMoneyBetweenUsers");
+									return new VoidWrapper();
+								}
+						));
+						break;
+				case REMOVE_MONEY: objOut.
+						writeObject(InvokerWrapper.catchInvocation(
+								() -> {
+									DualArgReplication<UserAccount, Long> dual =
+											(DualArgReplication<UserAccount,Long>)objIn.readObject();
+									walletController.removeMoney(dual.getArg1(), dual.getArg2());
+									logger.info("Successfully completed removeMoney");
+									return new VoidWrapper();
+								}
+						));
+						break;
+				case ADD_MONEY: objOut.
+						writeObject(InvokerWrapper.catchInvocation(
+								() -> {
+									DualArgReplication<UserAccount, Long> dual =
+											(DualArgReplication<UserAccount,Long>)objIn.readObject();
+									walletController.addMoney(dual.getArg1(), dual.getArg2());
+									logger.info("Successfully completed addMoney");
+									return new VoidWrapper();
+								}
+						));
+						break;
+				case GET_MONEY: objOut.
+						writeObject(InvokerWrapper.catchInvocation(
+								() -> {
+									//TODO log first?
+									logger.info("Successfully completed addMoney");
+									return walletController.currentAmount((String)objIn.readObject());
+								}
+						));
+						break;
+				case GET_LEDGER: objOut.
+						writeObject(InvokerWrapper.catchInvocation(
+							() -> {
+								logger.info("Successfully completed ledgerOfClientTransfers");
+								return walletController.ledgerOfClientTransfers().toArray();
+							}
+						));
+						break;
+				case GET_CLIENT_LEDGER: objOut.
+						writeObject(InvokerWrapper.catchInvocation(
+								() -> {
+									logger.info("Successfully completed ledgerOfClientTransfers");
+									return walletController.currentAmount((String)objIn.readObject());
+								}
+						));
+						break;
+				default:
+					logger.error("Not implemented");
+					break;
 			}
 
 			objOut.flush();
