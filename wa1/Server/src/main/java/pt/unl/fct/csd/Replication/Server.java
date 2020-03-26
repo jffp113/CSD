@@ -55,7 +55,7 @@ public class Server extends DefaultSingleRecoverable implements Runnable{
 
 	@Override
 	public byte[] appExecuteUnordered(byte[] command, MessageContext messageContext) {
-		return new byte[0];
+		return invokeCommand(command);
 	}
 
 	private byte[] invokeCommand(byte[] command) {
@@ -146,7 +146,6 @@ public class Server extends DefaultSingleRecoverable implements Runnable{
 			return null;
 		}
 	}
-
 
 	@Override
 	public void installSnapshot(byte[] bytes) {
