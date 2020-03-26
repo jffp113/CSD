@@ -17,6 +17,10 @@ public class ClientReplicator {
     @Autowired
     ServiceProxy serviceProxy;
 
+    public <V> V invokeReplication(Path path) {
+        return invokeReplication(null, path);
+    }
+
     public <V,E> V invokeReplication(E object,Path path){
         logger.info("Start invoking replication");
         try (ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
