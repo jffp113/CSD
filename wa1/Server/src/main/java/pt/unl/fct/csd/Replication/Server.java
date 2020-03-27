@@ -129,10 +129,14 @@ public class Server extends DefaultSingleRecoverable implements Runnable{
 						writeObject(InvokerWrapper.catchInvocation(
 								() -> {
 									logger.info("Successfully completed ledgerOfClientTransfers");
-									return walletController.ledgerOfClientTransfers((String)objIn.readObject()).toArray();
+									return walletController.
+											ledgerOfClientTransfers((String)objIn.readObject()).toArray();
 								}
 						));
 						break;
+
+				/************************************Auction Path Starts***********************************************/
+
 				case CREATE_AUCTION:objOut.
 						writeObject(InvokerWrapper.catchInvocation(
 								() -> {
