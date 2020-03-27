@@ -112,7 +112,7 @@ public class Server extends DefaultSingleRecoverable implements Runnable{
 						writeObject(InvokerWrapper.catchInvocation(
 								() -> {
 									//TODO log first?
-									logger.info("Successfully completed addMoney");
+									logger.info("Successfully completed currentAmount");
 									return walletController.currentAmount((String)objIn.readObject());
 								}
 						));
@@ -225,11 +225,12 @@ public class Server extends DefaultSingleRecoverable implements Runnable{
 
 	@Override
 	public void installSnapshot(byte[] bytes) {
-
+		logger.error("Not implemented");
 	}
 
 	@Override
 	public byte[] getSnapshot() {
+		logger.error("Not implemented");
 		return new byte[0];
 	}
 
