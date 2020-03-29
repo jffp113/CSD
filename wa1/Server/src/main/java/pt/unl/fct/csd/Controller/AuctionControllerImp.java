@@ -32,7 +32,7 @@ public class AuctionControllerImp implements AuctionController {
     @Autowired
     private UserAccountRepository userAccountRepository;
 
-    @Qualifier("ImpWalletReplicator")
+    @Qualifier("ImpWallet")
     @Autowired
     private WalletController walletController;
 
