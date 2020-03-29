@@ -11,9 +11,11 @@ docker network create \
   --gateway=172.1.0.1 csd || true
 
 
-for i in {1..4}
+for i in {1..1}
 do
-  docker run --rm -d --network=csd -p $((SERVER_PORT + i)):${SERVER_PORT} --ip "172.1.0.${END_IP}" -e "REPLICA_ID=${REPLICA_ID}"  -e "SERVER_PORT=${SERVER_PORT}" --name "replica${i}" server
+  #docker run --rm -d --network=csd -e MYSQL_ROOT_PASSWORD=toor --name "db${i}" csddatabase
+  docker run --rm -it --network=csd -p $((SERVER_PORT + i)):${SERVER_PORT}  -e MYSQL_HOST="db${i}" \
+   -e "REPLICA_ID=${REPLICA_ID}"  -e "SERVER_PORT=${SERVER_PORT}" --name "replica${i}" server
   ((REPLICA_ID++))
   ((END_IP++))
 done
