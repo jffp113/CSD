@@ -72,7 +72,7 @@ public class AutoClient {
         accountsMoney.forEach((username,amount) -> {
             try {
                 Long amountR = walletClient.currentAmount(username);
-                if(amount.equals(amountR)){
+                if(!amount.equals(amountR)){
                     logger.severe(String.format("Got %d should have gotten %d for %s", amountR,amount,username));
                 }
             } catch (ServerAnswerException e) {

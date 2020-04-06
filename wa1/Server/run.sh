@@ -95,7 +95,9 @@ elif [ "$MODE" == "upB" ]; then
 elif [ "$MODE" == "restart" ]; then
   stopService
   startService
-elif [ "$MODE" == "restartR" ]; then
+elif [ "$MODE" == "restartC" ]; then
   stopServiceAndClearDatabase
   startService
+else
+  echo "Command $MODE does not exist"
 fi
