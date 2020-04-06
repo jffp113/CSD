@@ -11,8 +11,12 @@ function printHelp() {
   echo "  run.sh <Mode>"
   echo "    <Mode>"
   echo "      - 'up' - bring up the service"
+  echo "      - 'upB' - compiling and deploying service"
   echo "      - 'down' - bring down the service"
-  echo "      - 'build' - build project docker, database docker"
+  echo "      - 'downC' - bring down the service and clear databases"
+  echo "      - 'restart' - restart the service"
+  echo "      - 'restartC' - clean restart the service"
+  echo "      - 'build' - compiling and container creation for project and database"
 }
 
 function startService() {
@@ -49,6 +53,11 @@ function stopService() {
     echo "Service Containers Stopped"
 }
 
+function stopServiceAndClearDatabase() {
+    stopService
+    rm -rf ./Database/db*
+}
+
 function buildService() {
   mvn clean package --settings settings.xml -DskipTests
   cd Database
@@ -70,7 +79,6 @@ else
   shift
 fi
 
-
 if [ "$MODE" == "up" ]; then
   echo "Starting Service"
   echo
@@ -79,4 +87,15 @@ elif [ "$MODE" == "down" ]; then
   stopService
 elif [ "$MODE" == "build" ]; then
   buildService
+elif [ "$MODE" == "downC" ]; then
+  stopServiceAndClearDatabase
+elif [ "$MODE" == "upB" ]; then
+  buildService
+  startService
+elif [ "$MODE" == "restart" ]; then
+  stopService
+  startService
+elif [ "$MODE" == "restartR" ]; then
+  stopServiceAndClearDatabase
+  startService
 fi
