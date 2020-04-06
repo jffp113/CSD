@@ -1,1 +1,0 @@
-docker container stop replica1 replica2 replica3 replica4 db1 db2 db3 db4
