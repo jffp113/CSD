@@ -4,12 +4,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
 import org.springframework.shell.standard.ShellOption;
+import pt.unl.fct.csd.cliente.Cliente.Anotation.NONAUTO;
 import pt.unl.fct.csd.cliente.Cliente.Model.Transaction;
 import pt.unl.fct.csd.cliente.Cliente.Services.WalletClient;
 import pt.unl.fct.csd.cliente.Cliente.exceptions.ServerAnswerException;
 
 import java.util.List;
 
+@NONAUTO
 @ShellComponent
 public class WalletRelatedCommandsImpl {
     //TODO improvement include a Terminal class with colors
