@@ -11,12 +11,10 @@ function printHelp() {
   echo "  run.sh <Mode>"
   echo "    <Mode>"
   echo "      - 'up' - bring up the service"
-  echo "      - 'upB' - compiling and deploying service"
   echo "      - 'down' - bring down the service"
-  echo "      - 'downC' - bring down the service and clear databases"
+  echo "      - 'clear' - clear database, take effect on next startup"
   echo "      - 'restart' - restart the service"
-  echo "      - 'restartC' - clean restart the service"
-  echo "      - 'build' - compiling and container creation for project and database"
+  echo "      - 'build' - container image creation for project and database"
 }
 
 function startService() {
@@ -25,16 +23,18 @@ function startService() {
   --driver=bridge \
   --subnet=172.1.0.0/16 \
   --gateway=172.1.0.1 csd || true
-
     echo "Service Containers Starting"
-
+    echo "Service Database Starting"
     for i in {1..4}
     do
       rm -rf "$(pwd)/Database/db${i}"
       docker run --rm -d --network=csd -v "$(pwd)/Database/db${i}":/var/lib/mysql -e MYSQL_ROOT_PASSWORD=toor --name "db${i}" csddatabase
     done
+    echo "Service Database Started"
 
-    sleep 15
+    echo "Waiting 1 minute before starting replicas"
+    sleep 60
+    echo "Starting replicas"
 
     for i in {1..4}
     do
@@ -53,9 +53,10 @@ function stopService() {
     echo "Service Containers Stopped"
 }
 
-function stopServiceAndClearDatabase() {
-    stopService
+function clearDatabase() {
+    echo "Clearing Database"
     rm -rf ./Database/db*
+    echo "Cleared Database"
 }
 
 function buildService() {
@@ -70,34 +71,32 @@ if (! docker stats --no-stream); then
   exit 0;
 fi
 
-## Parse mode
+
 if [[ $# -lt 1 ]]; then
   printHelp
   exit 0
-else
-  MODE=$1
-  shift
 fi
+
+while [[ $# -gt 0 ]]; do
+
+## Parse mode
+MODE=$1
+shift
 
 if [ "$MODE" == "up" ]; then
   echo "Starting Service"
-  echo
   startService
 elif [ "$MODE" == "down" ]; then
   stopService
 elif [ "$MODE" == "build" ]; then
   buildService
-elif [ "$MODE" == "downC" ]; then
-  stopServiceAndClearDatabase
-elif [ "$MODE" == "upB" ]; then
-  buildService
-  startService
+elif [ "$MODE" == "clear" ]; then
+  clearDatabase
 elif [ "$MODE" == "restart" ]; then
   stopService
-  startService
-elif [ "$MODE" == "restartC" ]; then
-  stopServiceAndClearDatabase
   startService
 else
   echo "Command $MODE does not exist"
 fi
+
+done
