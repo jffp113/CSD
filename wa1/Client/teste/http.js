@@ -2,15 +2,8 @@ import http from 'k6/http';
 
 
 export let options = {
-    tlsAuth: [
-      {
-            domains: ["localhost"],
-            cert: open("./pem.pem"),
-            key: open("./server.pem")
-        }
-    ],
     //maxRedirects: 4,
-    iterations: 1000,
+    iterations: 10000000,
     //vus: 100
 };
 
