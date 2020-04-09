@@ -4,22 +4,55 @@
 -Maven
 -Java 11+ (For compilation, not tested for Java 8 to 10)
 
-#Compile project
-Compile and creation of container:
+#Compile and Run project
 
-mvn clean package --settings settings.xml -DskipTests
+There is a script that allows you to compile and build the project. You can concatenate commands:
 
-Create of database container
+Lets see:
 
-cd ./Database
-./entrypoint.sh
+With this command you build the project
 
-#Run Project
+```
+./run.sh build
+```
 
-./run.sh
+If you want to build and execute the servers you do:
 
-#Stop Everything
+```
+./run.sh build up
+```
 
-./stop.sh
+If you want to stop the servers you do
+
+```
+./run.sh down
+```
+
+If you want to stop clean the databases and start the server you do:
+
+```
+./run.sh down clear up
+```
+
+
+You can concatenate any command shown here:
+```
+Usage: 
+  run.sh <Mode>
+    <Mode>
+      - 'up' - bring up the service
+      - 'down' - bring down the service
+      - 'clear' - clear database, take effect on next startup
+      - 'restart' - restart the service
+      - 'build' - container image creation for project and database
+```
+
+#System Analyses
+
+Report under development here:
+
+https://www.overleaf.com/9923788165bjzmmngqhkps
+
+
 
 
