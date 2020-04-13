@@ -13,6 +13,12 @@ Lets see:
 With this command you build the project
 
 ```
+./run.sh upV 3 1
+```
+
+If you want to start 3 correct replicas and 1 byzantine (On walletController)
+
+```
 ./run.sh build
 ```
 
@@ -41,6 +47,7 @@ Usage:
   run.sh <Mode>
     <Mode>
       - 'up' - bring up the service
+      - 'upV <correct> <byzantine>' - bring up the service with specified correct and byzantine replicas
       - 'down' - bring down the service
       - 'clear' - clear database, take effect on next startup
       - 'restart' - restart the service

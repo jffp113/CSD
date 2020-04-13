@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
 import pt.unl.fct.csd.Controller.AuctionController;
@@ -19,7 +20,6 @@ import pt.unl.fct.csd.Model.VoidWrapper;
 
 import javax.annotation.PostConstruct;
 import java.io.*;
-import java.util.Arrays;
 
 @PropertySource("classpath:application.properties")
 @Component
@@ -31,8 +31,12 @@ public class Server extends DefaultSingleRecoverable implements Runnable{
 	@Value("${replica.id}")
 	private int ID;
 
-	@Qualifier("ImpWallet")
+	@Value("${replica.byzantineBehaviour}")
+	private boolean isByzantine;
+
 	@Autowired
+	private ApplicationContext context;
+
 	private WalletController walletController;
 
 	@Qualifier("ImpAuction")
@@ -41,6 +45,7 @@ public class Server extends DefaultSingleRecoverable implements Runnable{
 
 	@PostConstruct
 	public void init(){
+		this.walletController = (WalletController)context.getBean((isByzantine ? "walletByz" : "ImpWallet"));
 		new ServiceReplica(ID, this, this);
 	}
 

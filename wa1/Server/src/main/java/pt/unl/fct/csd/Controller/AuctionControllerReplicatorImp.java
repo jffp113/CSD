@@ -26,10 +26,6 @@ public class AuctionControllerReplicatorImp implements AuctionController {
     @Autowired
     ClientReplicator clientReplicator;
 
-    @Qualifier("ImpAuction")
-    @Autowired
-    AuctionController auctionController;
-
     @Override
     public Long createAuction(String ownerId) {
         logger.info("Proxy received Create Auction");

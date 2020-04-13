@@ -24,10 +24,6 @@ public class WalletControllerReplicatorImp implements WalletController {
     @Autowired
     ClientReplicator clientReplicator;
 
-    @Qualifier("ImpWallet")
-    @Autowired
-    WalletController walletController;
-
     @Override
     public void createMoney(Transaction transaction) {
         logger.info("Proxy received request createMoney");
