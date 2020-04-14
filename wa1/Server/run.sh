@@ -55,7 +55,7 @@ function startService() {
     for (( i=$1 + 1; i<=$2 + $1; i++ ))
     do
       echo "Starting correct byzantine $(($i - $1))"
-    docker run --rm -d --network=csd -p $((SERVER_PORT + 4)):${SERVER_PORT}  -e MYSQL_HOST="db${i}" \
+    docker run --rm -d --network=csd -p $((SERVER_PORT + $2 + $i)):${SERVER_PORT}  -e MYSQL_HOST="db${i}" \
        -e "REPLICA_ID=${REPLICA_ID}"  -e "SERVER_PORT=${SERVER_PORT}" -e "REPLICA_BYZ=true" --name "replica${i}" server
       ((REPLICA_ID++))
       ((END_IP++))
