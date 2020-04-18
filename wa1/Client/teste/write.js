@@ -3,7 +3,7 @@ import http from 'k6/http';
 
 export let options = {
     //maxRedirects: 4,
-    iterations: 10000000,
+    iterations: 1000,
     //vus: 100
 };
 
