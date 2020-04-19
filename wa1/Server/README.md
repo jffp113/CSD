@@ -1,3 +1,11 @@
+#WA3
+
+Under "wa1/Server/Auditoria" can be found server auditing.
+
+The name "wa1" does not correspond to the version of the project.
+
+Project Version **WA3**
+
 #Requisites
 
 -Docker
