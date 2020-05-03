@@ -12,11 +12,14 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
 import pt.unl.fct.csd.Controller.AuctionController;
+import pt.unl.fct.csd.Controller.SmartContractController;
 import pt.unl.fct.csd.Controller.WalletController;
 import pt.unl.fct.csd.Model.Bid;
 import pt.unl.fct.csd.Model.Transaction;
 import pt.unl.fct.csd.Model.UserAccount;
 import pt.unl.fct.csd.Model.VoidWrapper;
+import pt.unl.fct.csd.SmartContract.AuthSmartContract;
+import pt.unl.fct.csd.SmartContract.AuthSmartContractImp;
 
 import javax.annotation.PostConstruct;
 import java.io.*;
@@ -42,6 +45,10 @@ public class Server extends DefaultSingleRecoverable implements Runnable{
 	@Qualifier("ImpAuction")
 	@Autowired
 	private AuctionController auctionController;
+
+	@Qualifier("ImpSmart")
+	@Autowired
+	private SmartContractController smartContractController;
 
 	@PostConstruct
 	public void init(){
@@ -213,6 +220,47 @@ public class Server extends DefaultSingleRecoverable implements Runnable{
 								}
 						));
 					break;
+
+				/************************************SMART Path Starts***********************************************/
+				case CREATE_SMART:objOut.
+						writeObject(InvokerWrapper.catchInvocation(
+						() -> {
+							logger.info("Get CREATE_SMART successfully invoked");
+							DualArgReplication<String, AuthSmartContractImp> dual =
+									(DualArgReplication<String, AuthSmartContractImp>)objIn.readObject();
+
+							smartContractController.createSmart(dual.getArg1(),dual.getArg2());
+
+							return new VoidWrapper();
+						}
+				));
+					break;
+				case REMOVE_SMART:objOut.
+						writeObject(InvokerWrapper.catchInvocation(
+								() -> {
+									logger.info("Get REMOVE_SMART successfully invoked");
+									smartContractController.deleteSmartContract((String)objIn.readObject());
+									return new VoidWrapper();
+								}
+						));
+					break;
+				case LIST_SMART:objOut.
+						writeObject(InvokerWrapper.catchInvocation(
+								() -> {
+									logger.info("Get LIST_SMART successfully invoked");
+									return smartContractController.ledgerSmartContracts().toArray();
+								}
+						));
+			  		break;
+				case GET_SMART:objOut.
+						writeObject(InvokerWrapper.catchInvocation(
+								() -> {
+									logger.info("Get GET_SMART successfully invoked");
+									return smartContractController.getSmartContract((String)objIn.readObject());
+								}
+						));
+					break;
+
 				default:
 					logger.error("Not implemented");
 					break;
