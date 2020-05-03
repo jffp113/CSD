@@ -7,6 +7,9 @@ import pt.unl.fct.csd.Replication.Path;
 import java.util.Arrays;
 import java.util.List;
 
+// Usado para preservar a interface *Controller
+// Obrigado génio Camponês
+
 public class GenericListResults<E, V> {
 
     private ClientReplicator clientReplicator;
@@ -20,8 +23,8 @@ public class GenericListResults<E, V> {
     }
 
     public List<E> getListWithPath (V args, Path path) {
-        InvokerWrapper<E[]> auctions = clientReplicator.
+        InvokerWrapper<E[]> reply = clientReplicator.
                 invokeUnorderedReplication(args, path);
-        return Arrays.asList(auctions.getResultOrThrow());
+        return Arrays.asList(reply.getResultOrThrow());
     }
 }

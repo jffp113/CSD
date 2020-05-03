@@ -3,19 +3,18 @@ package pt.unl.fct.csd.Controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pt.unl.fct.csd.Model.Auction;
 import pt.unl.fct.csd.Model.Bid;
+import pt.unl.fct.csd.Model.ReplyChain;
 import pt.unl.fct.csd.Model.VoidWrapper;
+import pt.unl.fct.csd.Replication.ClientAsynchReplicator;
 import pt.unl.fct.csd.Replication.ClientReplicator;
 import pt.unl.fct.csd.Replication.InvokerWrapper;
 import pt.unl.fct.csd.Replication.Path;
 
-import java.util.Arrays;
 import java.util.List;
-
 
 @RestController("ImpAuctionReplicator")
 @RequestMapping(value = AuctionController.BASE_URL)
@@ -24,14 +23,17 @@ public class AuctionControllerReplicatorImp implements AuctionController {
             LoggerFactory.getLogger(AuctionControllerReplicatorImp.class);
 
     @Autowired
+    ClientAsynchReplicator clientAsynchReplicator;
+    @Autowired
     ClientReplicator clientReplicator;
 
+
     @Override
-    public Long createAuction(String ownerId) {
+    public ReplyChain<Long> createAuction(String ownerId) throws InterruptedException {
         logger.info("Proxy received Create Auction");
-        InvokerWrapper<Long> auctionId = clientReplicator.
+        ReplyChain<Long> auctionId = clientAsynchReplicator.
                 invokeOrderedReplication(ownerId, Path.CREATE_AUCTION);
-        return auctionId.getResultOrThrow();
+        return auctionId;
     }
 
     @Override

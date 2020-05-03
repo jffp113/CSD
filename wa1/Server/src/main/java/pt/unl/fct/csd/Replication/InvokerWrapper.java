@@ -13,6 +13,7 @@ public class InvokerWrapper<E extends Serializable> implements Serializable{
         this.exception = exception;
         this.result = null;
     }
+
     private InvokerWrapper(E result){
         this.exception = null;
         this.result = result;
@@ -21,7 +22,7 @@ public class InvokerWrapper<E extends Serializable> implements Serializable{
     public static <E extends Serializable> InvokerWrapper<E> catchInvocation(Invoker<E> invoker){
         try{
             return new InvokerWrapper<>(invoker.doStuff());
-        }catch (RuntimeException e){
+        } catch (RuntimeException e){
             e.printStackTrace();
             return new InvokerWrapper<>(e);
         } catch (Exception e){
