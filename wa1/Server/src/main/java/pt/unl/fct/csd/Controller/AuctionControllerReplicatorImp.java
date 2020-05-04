@@ -9,10 +9,7 @@ import pt.unl.fct.csd.Model.Auction;
 import pt.unl.fct.csd.Model.Bid;
 import pt.unl.fct.csd.Model.ReplyChain;
 import pt.unl.fct.csd.Model.VoidWrapper;
-import pt.unl.fct.csd.Replication.ClientAsynchReplicator;
-import pt.unl.fct.csd.Replication.ClientReplicator;
-import pt.unl.fct.csd.Replication.InvokerWrapper;
-import pt.unl.fct.csd.Replication.Path;
+import pt.unl.fct.csd.Replication.*;
 
 import java.util.List;
 
@@ -29,11 +26,11 @@ public class AuctionControllerReplicatorImp implements AuctionController {
 
 
     @Override
-    public ReplyChain<Long> createAuction(String ownerId) throws InterruptedException {
+    public List<AsyncReply<InvokerWrapper<Long>>> createAuction(String ownerId) throws InterruptedException {
         logger.info("Proxy received Create Auction");
-        ReplyChain<Long> auctionId = clientAsynchReplicator.
+        List<AsyncReply<InvokerWrapper<Long>>> auctionIds = clientAsynchReplicator.
                 invokeOrderedReplication(ownerId, Path.CREATE_AUCTION);
-        return auctionId;
+        return auctionIds;
     }
 
     @Override

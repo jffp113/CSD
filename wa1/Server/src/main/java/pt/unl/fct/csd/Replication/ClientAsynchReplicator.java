@@ -25,14 +25,14 @@ public class ClientAsynchReplicator {
     @Autowired
     AsynchServiceProxy asynchSP;
 
-    public <V,E> ReplyChain<V> invokeOrderedReplication(E object, Path path) throws InterruptedException {
+    public <V extends Serializable,E> List<AsyncReply<InvokerWrapper<V>>> invokeOrderedReplication(E object, Path path) throws InterruptedException {
         logger.info("Start invoking async replication");
-        BlockingQueue<List<AsyncReply<V>>> replyChain = new LinkedBlockingDeque<>();
+        BlockingQueue<List<AsyncReply<InvokerWrapper<V>>>> replyChain = new LinkedBlockingDeque<>();
 
         asynchSP.invokeAsynchRequest(convertInput(object, path), new ReplyListener() {
 
             int repliesCounter = 0;
-            final List<AsyncReply<V>> replies = new LinkedList<>();
+            final List<AsyncReply<InvokerWrapper<V>>> replies = new LinkedList<>();
 
             @Override
             public void replyReceived(RequestContext requestContext, TOMMessage msg) {
@@ -49,7 +49,7 @@ public class ClientAsynchReplicator {
             }
         }, TOMMessageType.ORDERED_REQUEST);
 
-        return new ReplyChain<>(replyChain.take());
+        return replyChain.take();
     }
 
     private <E> byte[] convertInput (E object, Path path) {

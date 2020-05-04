@@ -5,6 +5,8 @@ import org.springframework.web.bind.annotation.*;
 import pt.unl.fct.csd.Model.Auction;
 import pt.unl.fct.csd.Model.Bid;
 import pt.unl.fct.csd.Model.ReplyChain;
+import pt.unl.fct.csd.Replication.AsyncReply;
+import pt.unl.fct.csd.Replication.InvokerWrapper;
 
 import java.util.List;
 
@@ -24,7 +26,7 @@ public interface AuctionController {
     String GET_CLIENT_BIDS = "/client/{clientId}";
     
     @PostMapping(value = CREATE_AUCTION)
-    ReplyChain<Long> createAuction(@PathVariable("ownerId") String ownerId) throws InterruptedException;
+    List<AsyncReply<InvokerWrapper<Long>>> createAuction(@PathVariable("ownerId") String ownerId) throws InterruptedException;
  
     @PutMapping(value = TERMINATE_AUCTION)
     void terminateAuction(@PathVariable("auctionId") long auctionId);
