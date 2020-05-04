@@ -5,17 +5,11 @@ import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
 import org.springframework.shell.standard.ShellOption;
 import pt.unl.fct.csd.cliente.Cliente.Anotation.NONAUTO;
-import pt.unl.fct.csd.cliente.Cliente.Model.AuthSmartContract;
-import pt.unl.fct.csd.cliente.Cliente.Model.AuthSmartContractImp;
-import pt.unl.fct.csd.cliente.Cliente.Model.Transaction;
 import pt.unl.fct.csd.cliente.Cliente.Services.SmartContractClient;
-import pt.unl.fct.csd.cliente.Cliente.Services.WalletClient;
 import pt.unl.fct.csd.cliente.Cliente.exceptions.ServerAnswerException;
 
-import java.io.*;
-import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 @NONAUTO
 @ShellComponent
@@ -35,21 +29,21 @@ public class SmartContractRelatedCommandsImpl {
                             @ShellOption( defaultValue = "false") boolean auction,
                             @ShellOption( defaultValue = "false") boolean smartContract){
 
-        Map<String,Boolean> map = new HashMap<>();
-
+       // Map<String,Boolean> map = new HashMap<>();
+        List<String> paths = new LinkedList<>();
         if(smartContract){
-            map.put("smart",true);
+            paths.add("smart");
         }
         if (wallet) {
-            map.put("money",true);
+            paths.add("money");
         }
         if (auction) {
-            map.put("auctions",true);
+            paths.add("auctions");
         }
 
 
         try {
-            client.createSmart(token,new AuthSmartContractImp(map,token));
+            client.createSmart(token,paths);
         } catch (ServerAnswerException e) {
            throw new RuntimeException(e);
         }

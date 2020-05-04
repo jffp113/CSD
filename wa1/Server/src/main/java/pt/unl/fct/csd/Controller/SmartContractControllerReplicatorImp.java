@@ -6,15 +6,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import pt.unl.fct.csd.Model.Transaction;
-import pt.unl.fct.csd.Model.UserAccount;
 import pt.unl.fct.csd.Model.VoidWrapper;
 import pt.unl.fct.csd.Replication.ClientReplicator;
 import pt.unl.fct.csd.Replication.DualArgReplication;
 import pt.unl.fct.csd.Replication.InvokerWrapper;
 import pt.unl.fct.csd.Replication.Path;
-import pt.unl.fct.csd.SmartContract.AuthSmartContract;
-import pt.unl.fct.csd.SmartContract.AuthSmartContractImp;
 
 import java.util.List;
 
@@ -29,7 +25,7 @@ public class SmartContractControllerReplicatorImp implements SmartContractContro
     ClientReplicator clientReplicator;
 
     @Override
-    public void createSmart(String token, AuthSmartContractImp smartContract) {
+    public void createSmart(String token, byte[] smartContract) {
         logger.info("Proxy received request createSmartContract");
         InvokerWrapper<VoidWrapper> result =
                 clientReplicator.invokeOrderedReplication(
@@ -53,9 +49,9 @@ public class SmartContractControllerReplicatorImp implements SmartContractContro
     }
 
     @Override
-    public AuthSmartContract getSmartContract(String token) {
+    public byte[] getSmartContract(String token) {
         logger.info("Proxy received request getSmartContract");
-        InvokerWrapper<AuthSmartContract> result =
+        InvokerWrapper<byte[]> result =
                 clientReplicator.invokeOrderedReplication(token,Path.GET_SMART);
 
         return result.getResultOrThrow();

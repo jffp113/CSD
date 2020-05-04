@@ -11,9 +11,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import pt.unl.fct.csd.cliente.Cliente.Handlers.RestTemplateHeaderModifierInterceptor;
 import pt.unl.fct.csd.cliente.Cliente.Handlers.RestTemplateResponseErrorHandler;
-import pt.unl.fct.csd.cliente.Cliente.Model.AuthSmartContract;
-import pt.unl.fct.csd.cliente.Cliente.Model.AuthSmartContractImp;
-import pt.unl.fct.csd.cliente.Cliente.Model.Transaction;
 import pt.unl.fct.csd.cliente.Cliente.exceptions.ServerAnswerException;
 
 import javax.annotation.PostConstruct;
@@ -66,9 +63,29 @@ public class SmartContractClientImpl implements SmartContractClient {
 
 
     @Override
-    public void createSmart(String token, AuthSmartContractImp smartContract) throws ServerAnswerException {
-        ResponseEntity<String> response = restTemplate.postForEntity(BASE + CREATE_SMART + token, smartContract, String.class);
+    public void createSmart(String token, List<String> smartContract) throws ServerAnswerException {
+        ResponseEntity<String> response = restTemplate.postForEntity(BASE + CREATE_SMART + token,
+                createSmartContract(smartContract), String.class);
         new HandleServerAnswer<Void>().processServerAnswer(response, Void.class);
+    }
+
+    private byte[] createSmartContract(List<String> smartContract){
+        StringBuilder builder = new StringBuilder();
+
+        builder.append("a = []\n");
+        for(String path : smartContract) {
+            builder.append("a.append(\"");
+            builder.append(path);
+            builder.append("\")\n");
+
+        }
+        builder.append("def auth(path):\n");
+        builder.append("\tfor i in a:\n");
+        builder.append("\t\tif i == path:\n");
+        builder.append("\t\t\treturn True\n");
+        builder.append("\treturn False");
+
+        return builder.toString().getBytes();
     }
 
     @Override

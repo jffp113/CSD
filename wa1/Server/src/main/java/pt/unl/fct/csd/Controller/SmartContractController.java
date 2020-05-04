@@ -2,10 +2,6 @@ package pt.unl.fct.csd.Controller;
 
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
-import pt.unl.fct.csd.Model.Transaction;
-import pt.unl.fct.csd.Model.UserAccount;
-import pt.unl.fct.csd.SmartContract.AuthSmartContract;
-import pt.unl.fct.csd.SmartContract.AuthSmartContractImp;
 
 import java.util.List;
 
@@ -22,8 +18,8 @@ public interface SmartContractController {
 
     @PostMapping(
             value = CREATE_SMART,
-            consumes = MediaType.APPLICATION_JSON_VALUE)
-    void createSmart(@PathVariable("token") String token,@RequestBody AuthSmartContractImp smartContract);
+            consumes = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    void createSmart(@PathVariable("token") String token,@RequestBody byte[] smartContract);
 
     @GetMapping(
             value = LIST_SMART,
@@ -35,7 +31,7 @@ public interface SmartContractController {
     )
     void deleteSmartContract(@PathVariable("token") String token);
 
-    AuthSmartContract getSmartContract(String token);
+    byte[] getSmartContract(String token);
 
 }
 

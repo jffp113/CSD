@@ -18,8 +18,6 @@ import pt.unl.fct.csd.Model.Bid;
 import pt.unl.fct.csd.Model.Transaction;
 import pt.unl.fct.csd.Model.UserAccount;
 import pt.unl.fct.csd.Model.VoidWrapper;
-import pt.unl.fct.csd.SmartContract.AuthSmartContract;
-import pt.unl.fct.csd.SmartContract.AuthSmartContractImp;
 
 import javax.annotation.PostConstruct;
 import java.io.*;
@@ -226,8 +224,8 @@ public class Server extends DefaultSingleRecoverable implements Runnable{
 						writeObject(InvokerWrapper.catchInvocation(
 						() -> {
 							logger.info("Get CREATE_SMART successfully invoked");
-							DualArgReplication<String, AuthSmartContractImp> dual =
-									(DualArgReplication<String, AuthSmartContractImp>)objIn.readObject();
+							DualArgReplication<String, byte[]> dual =
+									(DualArgReplication<String, byte[]>)objIn.readObject();
 
 							smartContractController.createSmart(dual.getArg1(),dual.getArg2());
 

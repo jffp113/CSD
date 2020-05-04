@@ -1,5 +1,7 @@
 package pt.unl.fct.csd.SmartContract;
 
+import org.python.core.PyBoolean;
+import org.python.util.PythonInterpreter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +14,7 @@ import pt.unl.fct.csd.Replication.Path;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Properties;
 
 
 public class AuthInterceptor extends HandlerInterceptorAdapter {
@@ -31,20 +34,36 @@ public class AuthInterceptor extends HandlerInterceptorAdapter {
 		if(token == null){
 			throw new NotAutorizedException();
 		}
-		logger.info("Token " + token);
 
-		AuthSmartContract contract = smartContractController.getSmartContract(token);
 
+		byte[] contract = smartContractController.getSmartContract(token);
 
 		String[] uri = request.getRequestURI()
 				.substring(1).split("/");
 
-		logger.info(uri[0]);
+		logger.info("Token " + token + "to Path:" + uri[0]);
 
-		if(!contract.canDoOperation(token, uri[0]))
+		if(uri[0].equals("error"))
+			return true;
+
+		if(!executeSmartContract(contract,uri[0]))
 			throw new NotAutorizedException();
 
 		return true;
+	}
+
+	private boolean executeSmartContract(byte[] smartContractBytes , String uri){
+
+		String smartContract = new String(smartContractBytes);
+
+		logger.info(smartContract);
+
+		PythonInterpreter pi = new PythonInterpreter();
+		pi.exec(smartContract);
+		pi.exec("result = auth(\""+uri+"\")");
+		PyBoolean result = (PyBoolean)pi.get("result");
+
+		return result.getBooleanValue();
 	}
 
 	@Override
