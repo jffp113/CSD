@@ -14,8 +14,8 @@ import pt.unl.fct.csd.Replication.*;
 import java.util.List;
 
 @RestController("ImpAuctionReplicator")
-@RequestMapping(value = AuctionController.BASE_URL)
-public class AuctionControllerReplicatorImp implements AuctionController {
+@RequestMapping(value = CollectiveAuctionController.BASE_URL)
+public class AuctionControllerReplicatorImp implements CollectiveAuctionController {
     private final Logger logger =
             LoggerFactory.getLogger(AuctionControllerReplicatorImp.class);
 
