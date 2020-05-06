@@ -29,25 +29,8 @@ public class ClientAsynchReplicator {
         logger.info("Start invoking async replication");
         BlockingQueue<List<AsyncReply<InvokerWrapper<V>>>> replyChain = new LinkedBlockingDeque<>();
 
-        asynchSP.invokeAsynchRequest(convertInput(object, path), new ReplyListener() {
-
-            int repliesCounter = 0;
-            final List<AsyncReply<InvokerWrapper<V>>> replies = new LinkedList<>();
-
-            @Override
-            public void replyReceived(RequestContext requestContext, TOMMessage msg) {
-                replies.add(new AsyncReply<>(msg.getSender(), parseReplicationReply(msg.getContent())));
-
-                double quorum = (Math.ceil((double) (asynchSP.getViewManager().getCurrentViewN() +
-                        asynchSP.getViewManager().getCurrentViewF() + 1) / 2.0));
-                if(++repliesCounter >= quorum) {
-                    logger.info("Enough replies received");
-
-                    replyChain.add(replies);
-                    asynchSP.cleanAsynchRequest(requestContext.getOperationId());
-                }
-            }
-        }, TOMMessageType.ORDERED_REQUEST);
+        asynchSP.invokeAsynchRequest(convertInput(object, path), new ReplyListenerImp(replyChain,asynchSP),
+                TOMMessageType.ORDERED_REQUEST);
 
         return replyChain.take();
     }
@@ -73,25 +56,5 @@ public class ClientAsynchReplicator {
             return byteOut.toByteArray();
         }
     }
-
-    private <V> V parseReplicationReply (byte[] replicationReply) {
-        try {
-            return tryToParseReplicationReply(replicationReply);
-        } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    private <V> V tryToParseReplicationReply (byte[] replicationReply)
-            throws IOException, ClassNotFoundException {
-        if (replicationReply == null || replicationReply.length == 0)
-            return null;
-        try (ByteArrayInputStream byteIn = new ByteArrayInputStream(replicationReply);
-             ObjectInput objIn = new ObjectInputStream(byteIn)) {
-            return (V) objIn.readObject();
-        }
-    }
-
 
 }
