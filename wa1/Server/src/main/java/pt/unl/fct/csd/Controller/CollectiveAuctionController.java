@@ -3,7 +3,7 @@ package pt.unl.fct.csd.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import pt.unl.fct.csd.Model.Bid;
-import pt.unl.fct.csd.Replication.AsyncReply;
+import pt.unl.fct.csd.Model.AsyncReply;
 
 import java.util.List;
 

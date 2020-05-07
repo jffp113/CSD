@@ -1,6 +1,7 @@
-package pt.unl.fct.csd.Replication;
+package pt.unl.fct.csd.Model;
 
 import bftsmart.tom.core.messages.TOMMessage;
+import pt.unl.fct.csd.Replication.ReplyParser;
 
 public class AsyncReply {
     private final int senderId;

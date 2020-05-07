@@ -58,6 +58,12 @@
             <version>0.0.20131108.vaadin1</version>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>bftsmart</groupId>
+            <artifactId>bftsmart</artifactId>
+            <version>1.0</version>
+            <scope>compile</scope>
+        </dependency>
 
 
     </dependencies>
