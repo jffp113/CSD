@@ -64,14 +64,12 @@ public class Server extends DefaultSingleRecoverable implements Runnable{
 
 	@Override
 	public byte[] appExecuteOrdered(byte[] command, MessageContext messageContext) {
-
-	    //return invokeCommand(command);
         return sendFullReply(invokeCommand(command));
 	}
 
 	@Override
 	public byte[] appExecuteUnordered(byte[] command, MessageContext messageContext) {
-		return invokeCommand(command);
+		return sendFullReply(invokeCommand(command));
 	}
 
 	private byte[] invokeCommand(byte[] command) {
@@ -240,10 +238,7 @@ public class Server extends DefaultSingleRecoverable implements Runnable{
 	}
 
 	private byte[] sendFullReply(byte[] serverReply) {
-		// we have to create an empty reply object or an exception
-		// because no reply is a reply and must be signed
-		if(serverReply.length == 0)
-			serverReply = "quickfix".getBytes();
+		logger.info("sendFullReply: reply len=" + serverReply.length);
 
         try (ByteArrayOutputStream bS = new ByteArrayOutputStream();
              DataOutputStream dS = new DataOutputStream(bS)) {
@@ -260,6 +255,7 @@ public class Server extends DefaultSingleRecoverable implements Runnable{
         dS.writeInt(serverReply.length);
         dS.write(serverReply);
         byte[] signedAnswer = sign(serverReply);
+		logger.info("tryToSendFullReply: signed reply len="+signedAnswer.length);
         dS.writeInt(signedAnswer.length);
         dS.write(signedAnswer);
         return bS.toByteArray();
