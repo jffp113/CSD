@@ -1,8 +1,10 @@
 package pt.unl.fct.csd.Replication;
 
+import bftsmart.reconfiguration.util.RSAKeyLoader;
 import bftsmart.tom.MessageContext;
 import bftsmart.tom.ServiceReplica;
 import bftsmart.tom.server.defaultservices.DefaultSingleRecoverable;
+import bftsmart.tom.util.TOMUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +26,9 @@ import java.io.*;
 @PropertySource("classpath:application.properties")
 @Component
 public class Server extends DefaultSingleRecoverable implements Runnable{
+
+    private static final String DEFAULT_KEY_CONFIG = "";
+
 	private final Logger logger =
 			LoggerFactory.getLogger(Server.class);
 
@@ -43,10 +48,13 @@ public class Server extends DefaultSingleRecoverable implements Runnable{
 	@Autowired
 	private AuctionController auctionController;
 
+	private RSAKeyLoader keyLoader;
+
 	@PostConstruct
 	public void init(){
 		this.walletController = (WalletController)context.getBean((isByzantine ? "walletByz" : "ImpWallet"));
 		new ServiceReplica(ID, this, this);
+		this.keyLoader = new RSAKeyLoader(ID, DEFAULT_KEY_CONFIG);
 	}
 
 	@Override
@@ -56,7 +64,9 @@ public class Server extends DefaultSingleRecoverable implements Runnable{
 
 	@Override
 	public byte[] appExecuteOrdered(byte[] command, MessageContext messageContext) {
-		return invokeCommand(command);
+
+	    //return invokeCommand(command);
+        return sendFullReply(invokeCommand(command));
 	}
 
 	@Override
@@ -150,6 +160,7 @@ public class Server extends DefaultSingleRecoverable implements Runnable{
 									return auctionController.createAuction(clientId);
 								}
 						));
+					logger.info("Auction finished");
 					break;
 				case CREATE_BID_AUCTION: objOut.
 						writeObject(InvokerWrapper.catchInvocation(
@@ -227,6 +238,32 @@ public class Server extends DefaultSingleRecoverable implements Runnable{
 			return null;
 		}
 	}
+
+	private byte[] sendFullReply(byte[] serverReply) {
+        try (ByteArrayOutputStream bS = new ByteArrayOutputStream();
+             DataOutputStream dS = new DataOutputStream(bS)) {
+            return tryToSendFullReply(serverReply, bS, dS);
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.exit(1);
+        }
+        return null;
+    }
+
+    private byte[] tryToSendFullReply(byte[] serverReply, ByteArrayOutputStream bS, DataOutputStream dS)
+            throws Exception {
+        dS.writeInt(serverReply.length);
+        dS.write(serverReply);
+        byte[] signedAnswer = sign(serverReply);
+        dS.writeInt(signedAnswer.length);
+        dS.write(signedAnswer);
+        return bS.toByteArray();
+    }
+
+    private byte[] sign(byte[] serverReply) throws Exception {
+	    byte[] hashed = TOMUtil.computeHash(serverReply);
+	    return TOMUtil.signMessage(keyLoader.loadPrivateKey(), hashed);
+    }
 
 	@Override
 	public void installSnapshot(byte[] bytes) {
