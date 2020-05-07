@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pt.unl.fct.csd.Model.Auction;
 import pt.unl.fct.csd.Model.Bid;
-import pt.unl.fct.csd.Model.ReplyChain;
 import pt.unl.fct.csd.Model.VoidWrapper;
 import pt.unl.fct.csd.Replication.*;
 
@@ -20,17 +19,15 @@ public class AuctionControllerReplicatorImp implements CollectiveAuctionControll
             LoggerFactory.getLogger(AuctionControllerReplicatorImp.class);
 
     @Autowired
-    ClientAsynchReplicator clientAsynchReplicator;
+    ClientAsyncReplicator clientAsyncReplicator;
     @Autowired
     ClientReplicator clientReplicator;
 
 
     @Override
-    public List<AsyncReply<InvokerWrapper<Long>>> createAuction(String ownerId) throws InterruptedException {
+    public List<AsyncReply> createAuction(String ownerId) throws InterruptedException {
         logger.info("Proxy received Create Auction");
-        List<AsyncReply<InvokerWrapper<Long>>> auctionIds = clientAsynchReplicator.
-                invokeOrderedReplication(ownerId, Path.CREATE_AUCTION);
-        return auctionIds;
+        return clientAsyncReplicator.invokeOrderedReplication(ownerId, Path.CREATE_AUCTION);
     }
 
     @Override

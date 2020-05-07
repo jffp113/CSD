@@ -2,36 +2,31 @@ package pt.unl.fct.csd.Replication;
 
 import bftsmart.communication.client.ReplyListener;
 import bftsmart.tom.AsynchServiceProxy;
-import bftsmart.tom.RequestContext;
-import bftsmart.tom.core.messages.TOMMessage;
 import bftsmart.tom.core.messages.TOMMessageType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import pt.unl.fct.csd.Model.ReplyChain;
 
 import java.io.*;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
 
 @Service
-public class ClientAsynchReplicator {
+public class ClientAsyncReplicator {
     private final Logger logger =
-            LoggerFactory.getLogger(ClientAsynchReplicator.class);
+            LoggerFactory.getLogger(ClientAsyncReplicator.class);
 
     @Autowired
-    AsynchServiceProxy asynchSP;
+    AsynchServiceProxy asyncSP;
 
-    public <V extends Serializable,E> List<AsyncReply<InvokerWrapper<V>>> invokeOrderedReplication(E object, Path path) throws InterruptedException {
+    public <E> List<AsyncReply> invokeOrderedReplication(E object, Path path) throws InterruptedException {
         logger.info("Start invoking async replication");
-        BlockingQueue<List<AsyncReply<InvokerWrapper<V>>>> replyChain = new LinkedBlockingDeque<>();
-
-        asynchSP.invokeAsynchRequest(convertInput(object, path), new ReplyListenerImp(replyChain,asynchSP),
-                TOMMessageType.ORDERED_REQUEST);
-
+        BlockingQueue<List<AsyncReply>> replyChain = new LinkedBlockingDeque<>();
+        byte[] request = convertInput(object, path);
+        ReplyListener replyListener = new ReplyListenerImp(replyChain, asyncSP);
+        asyncSP.invokeAsynchRequest(request, replyListener, TOMMessageType.ORDERED_REQUEST);
         return replyChain.take();
     }
 

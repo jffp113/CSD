@@ -7,26 +7,24 @@ import bftsmart.tom.core.messages.TOMMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingDeque;
 
-public class ReplyListenerImp<V extends Serializable> implements ReplyListener {
+public class ReplyListenerImp implements ReplyListener {
 
     private final Logger logger =
-            LoggerFactory.getLogger(ClientAsynchReplicator.class);
+            LoggerFactory.getLogger(ClientAsyncReplicator.class);
+
+    private final List<AsyncReply> replies = new LinkedList<>();
+
+    private final BlockingQueue<List<AsyncReply>> replyChain;
+
+    private final AsynchServiceProxy asynchSP;
 
     int repliesCounter = 0;
-    final List<AsyncReply<InvokerWrapper<V>>> replies = new LinkedList<>();
 
-    BlockingQueue<List<AsyncReply<InvokerWrapper<V>>>> replyChain;
-
-    AsynchServiceProxy asynchSP;
-
-
-    public ReplyListenerImp(BlockingQueue<List<AsyncReply<InvokerWrapper<V>>>> replyChain, AsynchServiceProxy asynchSP) {
+    public ReplyListenerImp(BlockingQueue<List<AsyncReply>> replyChain, AsynchServiceProxy asynchSP) {
         this.replyChain = replyChain;
         this.asynchSP = asynchSP;
     }
@@ -34,7 +32,8 @@ public class ReplyListenerImp<V extends Serializable> implements ReplyListener {
     @Override
         public void replyReceived(RequestContext requestContext, TOMMessage msg) {
         logger.info("Invoked replyReceived");
-        replies.add(new AsyncReply<>(msg.getSender(), parseReplicationReply(msg.getContent())));
+
+        replies.add(new AsyncReply(msg.getSender(), new ReplyParser(msg.getContent())));
 
         double quorum = (Math.ceil((double) (asynchSP.getViewManager().getCurrentViewN() + //4
                 asynchSP.getViewManager().getCurrentViewF() + 1) / 2.0));
@@ -47,7 +46,7 @@ public class ReplyListenerImp<V extends Serializable> implements ReplyListener {
     }
 
 
-    private <V> V parseReplicationReply (byte[] replicationReply) {
+    /*private <V> V parseReplicationReply (byte[] replicationReply) {
         try {
             return tryToParseReplicationReply(replicationReply);
         } catch (IOException | ClassNotFoundException e) {
@@ -64,5 +63,5 @@ public class ReplyListenerImp<V extends Serializable> implements ReplyListener {
              ObjectInput objIn = new ObjectInputStream(byteIn)) {
             return (V) objIn.readObject();
         }
-    }
+    }*/
 }
