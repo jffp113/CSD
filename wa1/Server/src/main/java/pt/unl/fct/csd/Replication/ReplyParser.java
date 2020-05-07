@@ -17,14 +17,18 @@ public class ReplyParser {
 
     public ReplyParser(byte[] fullReply) {
         logger.info("ReplyParser: full reply len=" + fullReply.length);
+
         try (ByteArrayInputStream in = new ByteArrayInputStream(fullReply);
              DataInputStream inReader = new DataInputStream(in)) {
+
             int replyLength = inReader.readInt();
-            logger.info("ReplyParser: read reply len=" + replyLength);
+            logger.info("ReplyParser: (read) reply len=" + replyLength);
             reply = inReader.readNBytes(replyLength);
+
             int signedLength = inReader.readInt();
-            logger.info("ReplyParser: read signed reply len=" + signedLength);
+            logger.info("ReplyParser: (read) signed reply len=" + signedLength);
             signedReply = inReader.readNBytes(signedLength);
+
         } catch (IOException e) {
             e.printStackTrace();
         }
