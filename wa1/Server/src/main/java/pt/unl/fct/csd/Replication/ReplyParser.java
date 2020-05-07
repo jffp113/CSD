@@ -11,6 +11,7 @@ public class ReplyParser {
     private byte[] signedReply = new byte[0];
 
     public ReplyParser(byte[] fullReply) {
+        // fullReply.length always > 0 because at least a signature is provided
         try (ByteArrayInputStream in = new ByteArrayInputStream(fullReply);
              DataInputStream inReader = new DataInputStream(in)) {
             int replyLength = inReader.readInt();

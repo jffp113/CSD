@@ -240,6 +240,11 @@ public class Server extends DefaultSingleRecoverable implements Runnable{
 	}
 
 	private byte[] sendFullReply(byte[] serverReply) {
+		// we have to create an empty reply object or an exception
+		// because no reply is a reply and must be signed
+		if(serverReply.length == 0)
+			serverReply = "quickfix".getBytes();
+
         try (ByteArrayOutputStream bS = new ByteArrayOutputStream();
              DataOutputStream dS = new DataOutputStream(bS)) {
             return tryToSendFullReply(serverReply, bS, dS);
