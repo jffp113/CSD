@@ -47,10 +47,9 @@ public class AuctionControllerReplicatorImp implements CollectiveAuctionControll
     }
 
     @Override
-    public List<Auction> getOpenAuctions() {
+    public List<AsyncReply> getOpenAuctions() {
         logger.info("Proxy received Get Open Auctions");
-        return new GenericListResults<Auction, Void>(clientReplicator).
-                getListWithPath(Path.GET_OPEN_AUCTIONS);
+        return clientAsyncReplicator.invokeUnorderedReplication(Path.GET_OPEN_AUCTIONS);
     }
 
     @Override

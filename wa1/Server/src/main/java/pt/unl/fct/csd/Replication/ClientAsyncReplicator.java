@@ -13,6 +13,9 @@ import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
 
+import static bftsmart.tom.core.messages.TOMMessageType.ORDERED_REQUEST;
+import static bftsmart.tom.core.messages.TOMMessageType.UNORDERED_REQUEST;
+
 @Service
 public class ClientAsyncReplicator {
     private final Logger logger =
@@ -21,12 +24,38 @@ public class ClientAsyncReplicator {
     @Autowired
     AsynchServiceProxy asyncSP;
 
-    public <E> List<AsyncReply> invokeOrderedReplication(E object, Path path) throws InterruptedException {
+    public List<AsyncReply> invokeUnorderedReplication(Path path) {
+        return invokeUnorderedReplication(null, path);
+    }
+
+    public <E> List<AsyncReply> invokeUnorderedReplication(E object, Path path) {
+        return invoke(object, path, UNORDERED_REQUEST);
+    }
+
+    public List<AsyncReply> invokeOrderedReplication(Path path) {
+        return invokeOrderedReplication(null, path);
+    }
+
+    public <E> List<AsyncReply> invokeOrderedReplication(E object, Path path) {
+        return invoke(object, path, ORDERED_REQUEST);
+    }
+
+    private <E> List<AsyncReply> invoke(E object, Path path, TOMMessageType type) {
+        try {
+            return tryToInvoke(object, path, type);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+            System.exit(1);
+        }
+        return null;
+    }
+
+    private <E> List<AsyncReply> tryToInvoke(E object, Path path, TOMMessageType type) throws InterruptedException {
         logger.info("Start invoking async replication");
         BlockingQueue<List<AsyncReply>> replyChain = new LinkedBlockingDeque<>();
         byte[] request = convertInput(object, path);
         ReplyListener replyListener = new ReplyListenerImp(replyChain, asyncSP);
-        asyncSP.invokeAsynchRequest(request, replyListener, TOMMessageType.ORDERED_REQUEST);
+        asyncSP.invokeAsynchRequest(request, replyListener, type);
         return replyChain.take();
     }
 

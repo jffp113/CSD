@@ -32,7 +32,7 @@ public interface CollectiveAuctionController {
     @GetMapping(
             value = GET_OPEN_AUCTIONS,
             produces = APPLICATION_JSON_VALUE)
-    List<Auction> getOpenAuctions();
+    List<AsyncReply> getOpenAuctions();
 
     @GetMapping(
             value = GET_CLOSED_AUCTIONS,
