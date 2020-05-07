@@ -20,4 +20,8 @@ public class AsyncReply {
     public byte[] getReply(){
         return reply;
     }
+
+    public byte[] getSignedReply() {
+        return signedReply;
+    }
 }
