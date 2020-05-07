@@ -9,8 +9,10 @@ import org.springframework.web.bind.annotation.RestController;
 import pt.unl.fct.csd.Model.Transaction;
 import pt.unl.fct.csd.Model.UserAccount;
 import pt.unl.fct.csd.Replication.*;
+import pt.unl.fct.csd.Model.AsyncReply;
 
 import java.util.List;
+
 
 @PropertySource("classpath:application.properties")
 @RestController("ImpWalletReplicator")
