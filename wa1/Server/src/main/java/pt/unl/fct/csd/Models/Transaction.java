@@ -1,4 +1,4 @@
-package Models;
+package pt.unl.fct.csd.Models;
 
 
 import javax.persistence.*;
@@ -22,15 +22,15 @@ public class Transaction implements Serializable {
     private Long amount;
 
 
-    public static Transaction createToWithAmount(String to,Long amount){
-       Transaction tmp = new Transaction();
+    public static pt.unl.fct.csd.Models.Transaction createToWithAmount(String to, Long amount){
+       pt.unl.fct.csd.Models.Transaction tmp = new pt.unl.fct.csd.Models.Transaction();
        tmp.setTo(to);
        tmp.setAmount(amount);
        return tmp;
     }
 
-    public static Transaction createFromToWithAmount(String from, String to,Long amount){
-        Transaction tmp = createToWithAmount(to,amount);
+    public static pt.unl.fct.csd.Models.Transaction createFromToWithAmount(String from, String to, Long amount){
+        pt.unl.fct.csd.Models.Transaction tmp = createToWithAmount(to,amount);
         tmp.setFrom(from);
 
         return tmp;

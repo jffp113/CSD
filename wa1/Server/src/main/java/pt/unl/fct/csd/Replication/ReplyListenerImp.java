@@ -1,12 +1,13 @@
 package pt.unl.fct.csd.Replication;
 
+import pt.unl.fct.csd.Models.ReplicaSignature;
 import bftsmart.communication.client.ReplyListener;
 import bftsmart.tom.AsynchServiceProxy;
 import bftsmart.tom.RequestContext;
 import bftsmart.tom.core.messages.TOMMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import pt.unl.fct.csd.Model.SystemReply;
+import pt.unl.fct.csd.Models.SystemReply;
 
 import java.util.ArrayList;
 import java.util.Arrays;

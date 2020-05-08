@@ -3,7 +3,7 @@ package pt.unl.fct.csd.Controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import pt.unl.fct.csd.Exceptions.UserDoesNotExistException;
-import pt.unl.fct.csd.Model.UserAccount;
+import pt.unl.fct.csd.Models.UserAccount;
 import pt.unl.fct.csd.Repository.UserAccountRepository;
 
 import java.util.Optional;

@@ -1,5 +1,7 @@
 package pt.unl.fct.csd.Controller;
 
+import pt.unl.fct.csd.Models.Transaction;
+import pt.unl.fct.csd.Models.UserAccount;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -7,8 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import pt.unl.fct.csd.Exceptions.*;
-import pt.unl.fct.csd.Model.Transaction;
-import pt.unl.fct.csd.Model.UserAccount;
 import pt.unl.fct.csd.Repository.TransactionRepository;
 import pt.unl.fct.csd.Repository.UserAccountRepository;
 

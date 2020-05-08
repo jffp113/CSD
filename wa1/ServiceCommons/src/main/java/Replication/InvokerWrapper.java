@@ -1,8 +1,5 @@
 package Replication;
 
-
-import Exceptions.InternalServerError;
-
 import java.io.Serializable;
 
 public class InvokerWrapper<E extends Serializable> implements Serializable{
@@ -28,7 +25,7 @@ public class InvokerWrapper<E extends Serializable> implements Serializable{
             return new InvokerWrapper<>(e);
         } catch (Exception e){
             e.printStackTrace();
-            return new InvokerWrapper<>(new InternalServerError());
+            return new InvokerWrapper<>(new RuntimeException());
         }
     }
 

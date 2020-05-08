@@ -1,6 +1,6 @@
-package pt.unl.fct.csd.Model;
+package pt.unl.fct.csd.Models;
 
-import Models.ReplicaSignature;
+import pt.unl.fct.csd.Models.ReplicaSignature;
 
 import java.util.Collection;
 

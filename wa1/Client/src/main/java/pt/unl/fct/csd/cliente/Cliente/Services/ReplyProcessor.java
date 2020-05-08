@@ -1,15 +1,12 @@
 package pt.unl.fct.csd.cliente.Cliente.Services;
 
-import pt.unl.fct.csd.cliente.Cliente.Model.InvokerWrapper;
+import Replication.InvokerWrapper;
 import pt.unl.fct.csd.cliente.Cliente.exceptions.NoMajorityAnswerException;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.ObjectInput;
-import java.io.ObjectInputStream;
+import java.io.*;
 import java.util.*;
 
-public class ReplyProcessor<E> {
+public class ReplyProcessor<E extends Serializable> {
 
     private final Map<byte[], Integer> answersFrequency;
 

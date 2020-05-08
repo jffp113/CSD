@@ -2,8 +2,8 @@ package pt.unl.fct.csd.Controller;
 
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
-import pt.unl.fct.csd.Model.Auction;
-import pt.unl.fct.csd.Model.Bid;
+import pt.unl.fct.csd.Models.Auction;
+import pt.unl.fct.csd.Models.Bid;
 
 import java.util.List;
 

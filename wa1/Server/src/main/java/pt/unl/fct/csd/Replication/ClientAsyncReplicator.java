@@ -1,5 +1,6 @@
 package pt.unl.fct.csd.Replication;
 
+import pt.unl.fct.csd.Models.SystemReply;
 import bftsmart.communication.client.ReplyListener;
 import bftsmart.tom.AsynchServiceProxy;
 import bftsmart.tom.core.messages.TOMMessageType;
@@ -7,7 +8,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import pt.unl.fct.csd.Model.SystemReply;
 
 import java.io.*;
 import java.util.concurrent.BlockingQueue;

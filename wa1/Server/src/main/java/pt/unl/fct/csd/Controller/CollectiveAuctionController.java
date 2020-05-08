@@ -2,8 +2,8 @@ package pt.unl.fct.csd.Controller;
 
 import org.springframework.web.bind.annotation.*;
 
-import pt.unl.fct.csd.Model.Bid;
-import pt.unl.fct.csd.Model.SystemReply;
+import pt.unl.fct.csd.Models.Bid;
+import pt.unl.fct.csd.Models.SystemReply;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 

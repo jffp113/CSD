@@ -1,4 +1,4 @@
-package Models;
+package pt.unl.fct.csd.Models;
 
 import java.io.Serializable;
 

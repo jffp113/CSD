@@ -6,9 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import pt.unl.fct.csd.Model.SystemReply;
-import pt.unl.fct.csd.Model.Transaction;
-import pt.unl.fct.csd.Model.UserAccount;
+import pt.unl.fct.csd.Models.SystemReply;
+import pt.unl.fct.csd.Models.Transaction;
+import pt.unl.fct.csd.Models.UserAccount;
 import pt.unl.fct.csd.Replication.*;
 
 

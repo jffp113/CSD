@@ -1,6 +1,8 @@
 package pt.unl.fct.csd.cliente.Cliente.Model;
 
-public class Bid {
+import java.io.Serializable;
+
+public class Bid implements Serializable {
 
 	private Long id;
 

@@ -1,8 +1,8 @@
 package pt.unl.fct.csd.Controller;
 
+import pt.unl.fct.csd.Models.Transaction;
+import pt.unl.fct.csd.Models.UserAccount;
 import org.springframework.web.bind.annotation.*;
-import pt.unl.fct.csd.Model.Transaction;
-import pt.unl.fct.csd.Model.UserAccount;
 
 import java.util.List;
 

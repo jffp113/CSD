@@ -1,14 +1,12 @@
 package pt.unl.fct.csd.cliente.Cliente.Services;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.ObjectInput;
-import java.io.ObjectInputStream;
+import java.io.*;
 import java.util.Arrays;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
 
+import Replication.InvokerWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -22,7 +20,6 @@ import org.springframework.web.client.RestTemplate;
 import pt.unl.fct.csd.cliente.Cliente.Handlers.RestTemplateResponseErrorHandler;
 import pt.unl.fct.csd.cliente.Cliente.Model.Auction;
 import pt.unl.fct.csd.cliente.Cliente.Model.Bid;
-import pt.unl.fct.csd.cliente.Cliente.Model.InvokerWrapper;
 import pt.unl.fct.csd.cliente.Cliente.Model.SystemReply;
 import pt.unl.fct.csd.cliente.Cliente.exceptions.NoMajorityAnswerException;
 import pt.unl.fct.csd.cliente.Cliente.exceptions.ServerAnswerException;
@@ -90,25 +87,25 @@ public class AuctionClientImpl implements AuctionClient {
 	@Override
 	public List<Auction> getOpenAuctions() throws ServerAnswerException {
 		String urlComplete = String.format(Path.GET_OPEN_AUCTIONS.url, BASE);
-		return new ExtractAnswer<List<Auction>>().extractAnswerGet(urlComplete);
+		return Arrays.asList(new ExtractAnswer<Auction[]>().extractAnswerGet(urlComplete));
 	}
 
 	@Override
 	public List<Auction> getClosedAuctions() throws ServerAnswerException {
 		String urlComplete = String.format(Path.GET_CLOSED_AUCTIONS.url, BASE);
-		return new ExtractAnswer<List<Auction>>().extractAnswerGet(urlComplete);
+		return Arrays.asList(new ExtractAnswer<Auction[]>().extractAnswerGet(urlComplete));
 	}
 
 	@Override
 	public List<Bid> getAuctionBids(long auctionId) throws ServerAnswerException {
 		String urlComplete = String.format(Path.GET_AUCTION_BIDS.url, BASE, auctionId);
-		return new ExtractAnswer<List<Bid>>().extractAnswerGet(urlComplete);
+		return Arrays.asList(new ExtractAnswer<Bid[]>().extractAnswerGet(urlComplete));
 	}
 
 	@Override
 	public List<Bid> getClientBids(String clientId) throws ServerAnswerException {
 		String urlComplete = String.format(Path.GET_CLIENT_BIDS.url, BASE, clientId);
-		return new ExtractAnswer<List<Bid>>().extractAnswerGet(urlComplete);
+		return Arrays.asList(new ExtractAnswer<Bid[]>().extractAnswerGet(urlComplete));
 	}
 
 	@Override
@@ -124,7 +121,7 @@ public class AuctionClientImpl implements AuctionClient {
 		return new ExtractAnswer<Long>().extractAnswerPost(urlComplete, bid);
 	}
 
-	private class ExtractAnswer<E> {
+	private class ExtractAnswer<E extends Serializable> {
 
     	private E extractAnswerGet (String url) throws ServerAnswerException {
 			ResponseEntity<SystemReply> response =

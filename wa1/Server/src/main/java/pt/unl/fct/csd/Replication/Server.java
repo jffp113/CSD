@@ -1,5 +1,7 @@
 package pt.unl.fct.csd.Replication;
 
+import pt.unl.fct.csd.Models.*;
+import Replication.InvokerWrapper;
 import bftsmart.reconfiguration.util.RSAKeyLoader;
 import bftsmart.tom.MessageContext;
 import bftsmart.tom.ServiceReplica;
@@ -15,10 +17,6 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
 import pt.unl.fct.csd.Controller.AuctionController;
 import pt.unl.fct.csd.Controller.WalletController;
-import pt.unl.fct.csd.Model.Bid;
-import pt.unl.fct.csd.Model.Transaction;
-import pt.unl.fct.csd.Model.UserAccount;
-import pt.unl.fct.csd.Model.VoidWrapper;
 
 import javax.annotation.PostConstruct;
 import java.io.*;
