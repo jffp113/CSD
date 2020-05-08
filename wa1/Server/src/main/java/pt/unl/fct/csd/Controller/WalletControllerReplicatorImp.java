@@ -3,78 +3,67 @@ package pt.unl.fct.csd.Controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pt.unl.fct.csd.Model.Transaction;
 import pt.unl.fct.csd.Model.UserAccount;
-import pt.unl.fct.csd.Model.VoidWrapper;
 import pt.unl.fct.csd.Replication.*;
+import pt.unl.fct.csd.Model.AsyncReply;
 
 import java.util.List;
+
 
 @PropertySource("classpath:application.properties")
 @RestController("ImpWalletReplicator")
 @RequestMapping(value = WalletController.BASE_URL)
-public class WalletControllerReplicatorImp implements WalletController {
+public class WalletControllerReplicatorImp implements CollectiveWalletController {
     private final Logger logger =
             LoggerFactory.getLogger(WalletControllerReplicatorImp.class);
 
     @Autowired
-    ClientReplicator clientReplicator;
+    ClientAsyncReplicator clientAsyncReplicator;
 
     @Override
-    public void createMoney(Transaction transaction) {
+    public List<AsyncReply> createMoney(Transaction transaction) {
         logger.info("Proxy received request createMoney");
-        InvokerWrapper<VoidWrapper> result =
-                clientReplicator.invokeOrderedReplication(transaction,Path.CREATE_MONEY);
-        result.getResultOrThrow();
+        return clientAsyncReplicator.invokeOrderedReplication(transaction, Path.CREATE_MONEY);
     }
 
     @Override
-    public void transferMoneyBetweenUsers(Transaction transaction) {
+    public List<AsyncReply> transferMoneyBetweenUsers(Transaction transaction) {
         logger.info("Proxy received request transferMoneyBetweenUsers");
-        InvokerWrapper<VoidWrapper> result =
-            clientReplicator.invokeOrderedReplication(transaction,Path.TRANSFER_MONEY);
-        result.getResultOrThrow();
+        return clientAsyncReplicator.invokeOrderedReplication(transaction, Path.TRANSFER_MONEY);
     }
 
     @Override
-    public void removeMoney(UserAccount user, long amount) {
+    public List<AsyncReply> removeMoney(UserAccount user, long amount) {
         logger.info("Proxy received request removeMoney");
-        InvokerWrapper<VoidWrapper> result =
-                clientReplicator.invokeOrderedReplication(new DualArgReplication<>(user,amount),Path.REMOVE_MONEY);
-        result.getResultOrThrow();
+        return clientAsyncReplicator.invokeOrderedReplication(new DualArgReplication<>(user, amount), Path.REMOVE_MONEY);
     }
 
     @Override
-    public void addMoney(UserAccount user, long amount) {
+    public List<AsyncReply> addMoney(UserAccount user, long amount) {
         logger.info("Proxy received request addMoney");
-        InvokerWrapper<VoidWrapper> result =
-                clientReplicator.invokeOrderedReplication(new DualArgReplication<>(user,amount),Path.ADD_MONEY);
-        result.getResultOrThrow();
+        return clientAsyncReplicator.invokeOrderedReplication(new DualArgReplication<>(user, amount), Path.ADD_MONEY);
     }
 
     @Override
-    public Long currentAmount(String userId) {
+    public List<AsyncReply> currentAmount(String userId) {
         logger.info("Proxy received request currentAmount");
-        InvokerWrapper<Long> result=
-            clientReplicator.invokeUnorderedReplication(userId, Path.GET_MONEY);
-        return result.getResultOrThrow();
+        return clientAsyncReplicator.invokeUnorderedReplication(userId, Path.GET_MONEY);
+    }
+
+    // we should change the name of this method
+    @Override
+    public List<AsyncReply> ledgerOfClientTransfers() {
+        logger.info("Proxy received request ledgerOfClientTransfers");
+        return clientAsyncReplicator.invokeUnorderedReplication(Path.GET_LEDGER);
     }
 
     @Override
-    public List<Transaction> ledgerOfClientTransfers() {
+    public List<AsyncReply> ledgerOfClientTransfers(String userId) {
         logger.info("Proxy received request ledgerOfClientTransfers");
-        return new GenericListResults<Transaction, Void>(clientReplicator)
-                .getListWithPath(Path.GET_LEDGER);
-    }
-
-    @Override
-    public List<Transaction> ledgerOfClientTransfers(String userId) {
-        logger.info("Proxy received request ledgerOfClientTransfers");
-        return new GenericListResults<Transaction, String>(clientReplicator)
-                .getListWithPath(userId,Path.GET_CLIENT_LEDGER);
+        return clientAsyncReplicator.invokeUnorderedReplication(userId,Path.GET_LEDGER);
     }
 }

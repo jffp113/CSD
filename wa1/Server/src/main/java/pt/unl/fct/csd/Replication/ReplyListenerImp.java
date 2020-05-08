@@ -17,32 +17,31 @@ public class ReplyListenerImp implements ReplyListener {
     private final Logger logger =
             LoggerFactory.getLogger(ClientAsyncReplicator.class);
 
+    private final AsynchServiceProxy asyncSP;
+
     private final List<AsyncReply> replies = new LinkedList<>();
+    private int repliesCounter = 0;
 
     private final BlockingQueue<List<AsyncReply>> replyChain;
 
-    private final AsynchServiceProxy asynchSP;
-
-    int repliesCounter = 0;
-
-    public ReplyListenerImp(BlockingQueue<List<AsyncReply>> replyChain, AsynchServiceProxy asynchSP) {
+    public ReplyListenerImp(BlockingQueue<List<AsyncReply>> replyChain, AsynchServiceProxy asyncSP) {
         this.replyChain = replyChain;
-        this.asynchSP = asynchSP;
+        this.asyncSP = asyncSP;
     }
 
     @Override
         public void replyReceived(RequestContext requestContext, TOMMessage msg) {
-        logger.info("Invoked replyReceived");
+        logger.info("ReplyListener: invoked replyReceived");
 
         replies.add(new AsyncReply(msg.getSender(), new ReplyParser(msg.getContent())));
 
-        double quorum = (Math.ceil((double) (asynchSP.getViewManager().getCurrentViewN() + //4
-                asynchSP.getViewManager().getCurrentViewF() + 1) / 2.0));
+        double quorum = (Math.ceil((double) (asyncSP.getViewManager().getCurrentViewN() + //4
+                asyncSP.getViewManager().getCurrentViewF() + 1) / 2.0));
         if(++repliesCounter >= quorum) {
-            logger.info("Enough replies received");
+            logger.info("ReplyListener: enough replies received");
 
             replyChain.add(replies);
-            asynchSP.cleanAsynchRequest(requestContext.getOperationId());
+            asyncSP.cleanAsynchRequest(requestContext.getOperationId());
         }
     }
 

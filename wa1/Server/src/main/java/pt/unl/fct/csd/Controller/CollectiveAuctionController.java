@@ -2,7 +2,6 @@ package pt.unl.fct.csd.Controller;
 
 import org.springframework.web.bind.annotation.*;
 
-import pt.unl.fct.csd.Model.Auction;
 import pt.unl.fct.csd.Model.Bid;
 import pt.unl.fct.csd.Model.AsyncReply;
 
@@ -27,7 +26,7 @@ public interface CollectiveAuctionController {
     List<AsyncReply> createAuction(@PathVariable("ownerId") String ownerId) throws InterruptedException;
 
     @PutMapping(value = TERMINATE_AUCTION)
-    void terminateAuction(@PathVariable("auctionId") long auctionId);
+    List<AsyncReply> terminateAuction(@PathVariable("auctionId") long auctionId);
    
     @GetMapping(
             value = GET_OPEN_AUCTIONS,
@@ -37,26 +36,26 @@ public interface CollectiveAuctionController {
     @GetMapping(
             value = GET_CLOSED_AUCTIONS,
             produces = APPLICATION_JSON_VALUE)
-    List<Auction> getClosedAuction();
+    List<AsyncReply> getClosedAuction();
 
     @GetMapping(
             value = GET_AUCTION_BIDS,
             produces = APPLICATION_JSON_VALUE)
-    List<Bid> getAuctionBids(@PathVariable("auctionId") long auctionId);
+    List<AsyncReply> getAuctionBids(@PathVariable("auctionId") long auctionId);
     
     @GetMapping(
             value = GET_CLIENT_BIDS,
             produces = APPLICATION_JSON_VALUE)
-    List<Bid> getClientBids(@PathVariable("clientId") String clientId);
+    List<AsyncReply> getClientBids(@PathVariable("clientId") String clientId);
     
     @GetMapping(
             value = GET_CLOSE_BID,
             produces = APPLICATION_JSON_VALUE)
-    Bid getCloseBid(@PathVariable("auctionId") long auctionId);
+    List<AsyncReply> getCloseBid(@PathVariable("auctionId") long auctionId);
 
     @PostMapping(
             value = CREATE_BID_AUCTION,
             consumes = APPLICATION_JSON_VALUE)
-    Long makeBid(@RequestBody Bid bid);
+    List<AsyncReply> makeBid(@RequestBody Bid bid);
 }
 
