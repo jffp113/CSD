@@ -22,6 +22,7 @@ import pt.unl.fct.csd.Model.VoidWrapper;
 
 import javax.annotation.PostConstruct;
 import java.io.*;
+import java.util.Objects;
 
 @PropertySource("classpath:application.properties")
 @Component
@@ -262,8 +263,7 @@ public class Server extends DefaultSingleRecoverable implements Runnable{
     }
 
     private byte[] sign(byte[] serverReply) throws Exception {
-	    byte[] hashed = TOMUtil.computeHash(serverReply);
-	    return TOMUtil.signMessage(keyLoader.loadPrivateKey(), hashed);
+	    return TOMUtil.signMessage(keyLoader.loadPrivateKey(), serverReply);
     }
 
 	@Override

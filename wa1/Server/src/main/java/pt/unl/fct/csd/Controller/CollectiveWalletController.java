@@ -21,12 +21,14 @@ public interface CollectiveWalletController {
 
     @PostMapping(
             value = CREATE_MONEY,
-            consumes = APPLICATION_JSON_VALUE)
+            consumes = APPLICATION_JSON_VALUE,
+            produces = APPLICATION_JSON_VALUE)
     SystemReply createMoney(@RequestBody Transaction transaction);
 
     @PostMapping(
             value = TRANSFER_MONEY,
-            consumes = APPLICATION_JSON_VALUE)
+            consumes = APPLICATION_JSON_VALUE,
+            produces = APPLICATION_JSON_VALUE)
     SystemReply transferMoneyBetweenUsers(@RequestBody Transaction transaction);
 
 

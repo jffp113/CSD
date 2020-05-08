@@ -3,10 +3,7 @@ package pt.unl.fct.csd.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import pt.unl.fct.csd.Model.Bid;
-import pt.unl.fct.csd.Model.AsyncReply;
 import pt.unl.fct.csd.Model.SystemReply;
-
-import java.util.List;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
@@ -23,10 +20,13 @@ public interface CollectiveAuctionController {
     String GET_AUCTION_BIDS = "/{auctionId}/bids";
     String GET_CLIENT_BIDS = "/client/{clientId}";
     
-    @PostMapping(value = CREATE_AUCTION)
+    @PostMapping(
+            value = CREATE_AUCTION,
+            produces = APPLICATION_JSON_VALUE)
     SystemReply createAuction(@PathVariable("ownerId") String ownerId) throws InterruptedException;
 
-    @PutMapping(value = TERMINATE_AUCTION)
+    @PutMapping(value = TERMINATE_AUCTION,
+            produces = APPLICATION_JSON_VALUE)
     SystemReply terminateAuction(@PathVariable("auctionId") long auctionId);
    
     @GetMapping(
@@ -56,7 +56,8 @@ public interface CollectiveAuctionController {
 
     @PostMapping(
             value = CREATE_BID_AUCTION,
-            consumes = APPLICATION_JSON_VALUE)
+            consumes = APPLICATION_JSON_VALUE,
+            produces = APPLICATION_JSON_VALUE)
     SystemReply makeBid(@RequestBody Bid bid);
 }
 

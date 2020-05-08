@@ -6,11 +6,10 @@ import bftsmart.tom.RequestContext;
 import bftsmart.tom.core.messages.TOMMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import pt.unl.fct.csd.Model.AsyncReply;
-import pt.unl.fct.csd.Model.ReplicaSignature;
 import pt.unl.fct.csd.Model.SystemReply;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.concurrent.BlockingQueue;
@@ -52,6 +51,7 @@ public class ReplyListenerImp <E> implements ReplyListener {
     private void recordReply(TOMMessage msg) {
         logger.info("ReplyListener: invoked replyReceived");
         ReplyParser parser = new ReplyParser(msg.getContent());
+        logger.info("Replica reply: " + Arrays.toString(parser.getReply()));
         replies.add(new ReplicaSignature(msg.getSender(), parser.getSignedReply()));
         if (asyncSP.getProcessId() == msg.getSender())
             thisReplicaReply = parser.getReply();
