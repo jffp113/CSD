@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import pt.unl.fct.csd.cliente.Cliente.Handlers.RestTemplateResponseErrorHandler;
+import pt.unl.fct.csd.cliente.Cliente.Model.AsyncReply;
 import pt.unl.fct.csd.cliente.Cliente.Model.Auction;
 import pt.unl.fct.csd.cliente.Cliente.Model.Bid;
 import pt.unl.fct.csd.cliente.Cliente.exceptions.ServerAnswerException;
@@ -88,7 +89,8 @@ public class AuctionClientImpl implements AuctionClient {
 	@Override
 	public List<Auction> getOpenAuctions() throws ServerAnswerException {
 		String urlComplete = String.format(Path.GET_OPEN_AUCTIONS.url, BASE);
-		return new ListObjects<Auction>().getListFromUrl(urlComplete, Auction[].class);
+		return new ExtractAnswer<List<Auction>>().extractAnswer(urlComplete);
+		//return new ListObjects<Auction>().getListFromUrl(urlComplete, Auction[].class);
 	}
 
 	@Override
@@ -137,5 +139,22 @@ public class AuctionClientImpl implements AuctionClient {
     		E[] elements = new HandleServerAnswer<E[]>().processServerAnswer(response, klass);
     		return Arrays.asList(elements);
 		}
+	}
+
+	private class ExtractAnswer<E> {
+
+    	private E extractAnswer (String url) throws ServerAnswerException {
+			ResponseEntity<AsyncReply[]> response =
+					restTemplate.getForEntity(url, AsyncReply[].class);
+			AsyncReply[] replies = response.getBody();
+			assert replies != null;
+			List<byte[]> verifiedReplies = SignatureVerifyer.getVerifiedReplies(Arrays.asList(replies));
+			try {
+				return new ReplyProcessor<E>(verifiedReplies).getMostFrequentAnswer();
+			} catch (Exception e) {
+				throw new ServerAnswerException(e.getMessage());
+			}
+		}
+
 	}
 }
