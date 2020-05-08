@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import pt.unl.fct.csd.Model.AsyncReply;
+import pt.unl.fct.csd.Model.SystemReply;
 
 import java.io.*;
 import java.util.List;
@@ -25,23 +26,23 @@ public class ClientAsyncReplicator {
     @Autowired
     AsynchServiceProxy asyncSP;
 
-    public List<AsyncReply> invokeUnorderedReplication(Path path) {
+    public SystemReply invokeUnorderedReplication(Path path) {
         return invokeUnorderedReplication(null, path);
     }
 
-    public <E> List<AsyncReply> invokeUnorderedReplication(E object, Path path) {
+    public <E> SystemReply invokeUnorderedReplication(E object, Path path) {
         return invoke(object, path, UNORDERED_REQUEST);
     }
 
-    public List<AsyncReply> invokeOrderedReplication(Path path) {
+    public SystemReply invokeOrderedReplication(Path path) {
         return invokeOrderedReplication(null, path);
     }
 
-    public <E> List<AsyncReply> invokeOrderedReplication(E object, Path path) {
+    public <E> SystemReply invokeOrderedReplication(E object, Path path) {
         return invoke(object, path, ORDERED_REQUEST);
     }
 
-    private <E> List<AsyncReply> invoke(E object, Path path, TOMMessageType type) {
+    private <E> SystemReply invoke(E object, Path path, TOMMessageType type) {
         try {
             return tryToInvoke(object, path, type);
         } catch (InterruptedException e) {
@@ -51,9 +52,9 @@ public class ClientAsyncReplicator {
         return null;
     }
 
-    private <E> List<AsyncReply> tryToInvoke(E object, Path path, TOMMessageType type) throws InterruptedException {
+    private <E> SystemReply tryToInvoke(E object, Path path, TOMMessageType type) throws InterruptedException {
         logger.info("Start invoking async replication");
-        BlockingQueue<List<AsyncReply>> replyChain = new LinkedBlockingDeque<>();
+        BlockingQueue<SystemReply> replyChain = new LinkedBlockingDeque<>();
         byte[] request = convertInput(object, path);
         ReplyListener replyListener = new ReplyListenerImp(replyChain, asyncSP);
         asyncSP.invokeAsynchRequest(request, replyListener, type);

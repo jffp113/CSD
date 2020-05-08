@@ -4,10 +4,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import pt.unl.fct.csd.Model.SystemReply;
 import pt.unl.fct.csd.Model.Transaction;
 import pt.unl.fct.csd.Model.UserAccount;
-import pt.unl.fct.csd.Model.AsyncReply;
-import java.util.List;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
@@ -23,33 +22,33 @@ public interface CollectiveWalletController {
     @PostMapping(
             value = CREATE_MONEY,
             consumes = APPLICATION_JSON_VALUE)
-    List<AsyncReply> createMoney(@RequestBody Transaction transaction);
+    SystemReply createMoney(@RequestBody Transaction transaction);
 
     @PostMapping(
             value = TRANSFER_MONEY,
             consumes = APPLICATION_JSON_VALUE)
-    List<AsyncReply> transferMoneyBetweenUsers(@RequestBody Transaction transaction);
+    SystemReply transferMoneyBetweenUsers(@RequestBody Transaction transaction);
 
 
     @GetMapping(
             value = GET_MONEY,
             produces = APPLICATION_JSON_VALUE)
-    List<AsyncReply> currentAmount(@PathVariable("id") String id);
+    SystemReply currentAmount(@PathVariable("id") String id);
 
     @GetMapping(
             value = GET_LEDGER,
             produces = APPLICATION_JSON_VALUE)
-    List<AsyncReply> ledgerOfClientTransfers();
+    SystemReply ledgerOfClientTransfers();
 
     @GetMapping(
             value = GET_CLIENT_LEDGER,
             produces = APPLICATION_JSON_VALUE)
-    List<AsyncReply> ledgerOfClientTransfers(@PathVariable("id") String id);
+    SystemReply ledgerOfClientTransfers(@PathVariable("id") String id);
 
     //don't remove this, it's a trap
-    List<AsyncReply> removeMoney(UserAccount user, long amount);
+    SystemReply removeMoney(UserAccount user, long amount);
 
     //don't remove this, it's a trap
-    List<AsyncReply> addMoney(UserAccount user, long amount);
+    SystemReply addMoney(UserAccount user, long amount);
 }
 
