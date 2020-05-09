@@ -16,6 +16,10 @@ public enum Path {
         ADD_MONEY,
         GET_MONEY,
         GET_LEDGER,
-        GET_CLIENT_LEDGER;
+        GET_CLIENT_LEDGER,
 
+        CREATE_SMART,
+        REMOVE_SMART,
+        LIST_SMART,
+        GET_SMART;
     }

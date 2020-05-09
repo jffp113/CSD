@@ -15,6 +15,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
 import pt.unl.fct.csd.Controller.AuctionController;
+import pt.unl.fct.csd.Controller.SmartContractController;
 import pt.unl.fct.csd.Controller.WalletController;
 import pt.unl.fct.csd.Model.*;
 
@@ -52,6 +53,10 @@ public class Server extends DefaultSingleRecoverable implements Runnable{
 
 	private RSAKeyLoader keyLoader;
 
+	@Qualifier("ImpSmart")
+	@Autowired
+	private SmartContractController smartContractController;
+
 	@PostConstruct
 	public void init(){
 		this.walletController = (WalletController)context.getBean((isByzantine ? "walletByz" : "ImpWallet"));
@@ -82,7 +87,7 @@ public class Server extends DefaultSingleRecoverable implements Runnable{
 
 			Path path = (Path)objIn.readObject();
 			logger.info(String.format("Searching for %s to invoke.", path));
-			switch(path){
+			switch(path) {
 				case CREATE_MONEY: {
 					InvokerWrapper result = InvokerWrapper.catchInvocation(
 							() -> {
@@ -95,11 +100,11 @@ public class Server extends DefaultSingleRecoverable implements Runnable{
 				}
 				case TRANSFER_MONEY: {
 					InvokerWrapper result = InvokerWrapper.catchInvocation(
-						() -> {
-							walletController.transferMoneyBetweenUsers((Transaction) objIn.readObject());
-							logger.info("Successfully completed transferMoneyBetweenUsers");
-							return VOID_ANSWER;
-						}
+							() -> {
+								walletController.transferMoneyBetweenUsers((Transaction) objIn.readObject());
+								logger.info("Successfully completed transferMoneyBetweenUsers");
+								return VOID_ANSWER;
+							}
 					);
 					return new Gson().toJson(result).getBytes();
 				}
@@ -117,42 +122,42 @@ public class Server extends DefaultSingleRecoverable implements Runnable{
 				}
 				case ADD_MONEY: {
 					InvokerWrapper result = InvokerWrapper.catchInvocation(
-						() -> {
-							DualArgReplication<UserAccount, Long> dual =
-									(DualArgReplication<UserAccount,Long>)objIn.readObject();
-							walletController.addMoney(dual.getArg1(), dual.getArg2());
-							logger.info("Successfully completed addMoney");
-							return VOID_ANSWER;
-						}
+							() -> {
+								DualArgReplication<UserAccount, Long> dual =
+										(DualArgReplication<UserAccount, Long>) objIn.readObject();
+								walletController.addMoney(dual.getArg1(), dual.getArg2());
+								logger.info("Successfully completed addMoney");
+								return VOID_ANSWER;
+							}
 					);
 					return new Gson().toJson(result).getBytes();
 				}
 				case GET_MONEY: {
-						InvokerWrapper result = InvokerWrapper.catchInvocation(
+					InvokerWrapper result = InvokerWrapper.catchInvocation(
 							() -> {
 								//TODO log first?
 								logger.info("Successfully completed currentAmount");
-								return String.valueOf(walletController.currentAmount((String)objIn.readObject()));
+								return String.valueOf(walletController.currentAmount((String) objIn.readObject()));
 							}
 					);
 					return new Gson().toJson(result).getBytes();
 				}
 				case GET_LEDGER: {
 					InvokerWrapper result = InvokerWrapper.catchInvocation(
-						() -> {
-							logger.info("Successfully completed ledgerOfClientTransfers");
-							return new Gson().toJson(walletController.ledgerOfClientTransfers());
-						}
+							() -> {
+								logger.info("Successfully completed ledgerOfClientTransfers");
+								return new Gson().toJson(walletController.ledgerOfClientTransfers());
+							}
 					);
 					return new Gson().toJson(result).getBytes();
 				}
 				case GET_CLIENT_LEDGER: {
 					InvokerWrapper result = InvokerWrapper.catchInvocation(
-						() -> {
-							logger.info("Successfully completed ledgerOfClientTransfers");
-							return new Gson()
-									.toJson(walletController.ledgerOfClientTransfers((String) objIn.readObject()));
-						}
+							() -> {
+								logger.info("Successfully completed ledgerOfClientTransfers");
+								return new Gson()
+										.toJson(walletController.ledgerOfClientTransfers((String) objIn.readObject()));
+							}
 					);
 					return new Gson().toJson(result).getBytes();
 				}
@@ -161,87 +166,130 @@ public class Server extends DefaultSingleRecoverable implements Runnable{
 
 				case CREATE_AUCTION: {
 					InvokerWrapper result = InvokerWrapper.catchInvocation(
-						() -> {
-							logger.info("Create auction successfully invoked");
-							String clientId = (String) objIn.readObject();
-							return String.valueOf(auctionController.createAuction(clientId));
-						}
+							() -> {
+								logger.info("Create auction successfully invoked");
+								String clientId = (String) objIn.readObject();
+								return String.valueOf(auctionController.createAuction(clientId));
+							}
 					);
 					return new Gson().toJson(result).getBytes();
 				}
 				case CREATE_BID_AUCTION: {
 					InvokerWrapper result = InvokerWrapper.catchInvocation(
-						() -> {
-							logger.info("Create auction bid successfully invoked");
-							Bid bid = (Bid) objIn.readObject();
-							return String.valueOf(auctionController.makeBid(bid));
-						}
+							() -> {
+								logger.info("Create auction bid successfully invoked");
+								Bid bid = (Bid) objIn.readObject();
+								return String.valueOf(auctionController.makeBid(bid));
+							}
 					);
 					return new Gson().toJson(result).getBytes();
 				}
 				case TERMINATE_AUCTION: {
 					InvokerWrapper result = InvokerWrapper.catchInvocation(
-						() -> {
-							logger.info("Terminate auction successfully invoked");
-							Long auctionId = (Long) objIn.readObject();
-							auctionController.terminateAuction(auctionId);
-							return VOID_ANSWER;
-						}
+							() -> {
+								logger.info("Terminate auction successfully invoked");
+								Long auctionId = (Long) objIn.readObject();
+								auctionController.terminateAuction(auctionId);
+								return VOID_ANSWER;
+							}
 					);
 					return new Gson().toJson(result).getBytes();
 				}
 				case GET_CLOSE_BID: {
 					InvokerWrapper result = InvokerWrapper.catchInvocation(
-						() -> {
-							logger.info("Get close bid successfully invoked");
-							Long auctionId = (Long) objIn.readObject();
-							return new Gson().toJson(auctionController.getCloseBid(auctionId));
-						}
+							() -> {
+								logger.info("Get close bid successfully invoked");
+								Long auctionId = (Long) objIn.readObject();
+								return new Gson().toJson(auctionController.getCloseBid(auctionId));
+							}
 					);
 					return new Gson().toJson(result).getBytes();
 				}
 				case GET_OPEN_AUCTIONS: {
 					InvokerWrapper result = InvokerWrapper.catchInvocation(
-						() -> {
-							logger.info("Get open auctions successfully invoked");
-							return new Gson().toJson(auctionController.getOpenAuctions());
-						}
+							() -> {
+								logger.info("Get open auctions successfully invoked");
+								return new Gson().toJson(auctionController.getOpenAuctions());
+							}
 					);
 					return new Gson().toJson(result).getBytes();
 				}
 				case GET_CLOSED_AUCTIONS: {
 					InvokerWrapper result = InvokerWrapper.catchInvocation(
-						()-> {
-							logger.info("Get close auctions successfully invoked");
-							return new Gson().toJson(auctionController.getClosedAuction());
-						}
+							() -> {
+								logger.info("Get close auctions successfully invoked");
+								return new Gson().toJson(auctionController.getClosedAuction());
+							}
 					);
 					return new Gson().toJson(result).getBytes();
 				}
 				case GET_AUCTION_BIDS: {
 					InvokerWrapper result = InvokerWrapper.catchInvocation(
-						() -> {
-							logger.info("Get auction bids successfully invoked");
-							Long auctionId = (Long) objIn.readObject();
-							return new Gson()
-									.toJson(auctionController.getAuctionBids(auctionId));
-						}
+							() -> {
+								logger.info("Get auction bids successfully invoked");
+								Long auctionId = (Long) objIn.readObject();
+								return new Gson()
+										.toJson(auctionController.getAuctionBids(auctionId));
+							}
 					);
 					return new Gson().toJson(result).getBytes();
 				}
 				case GET_CLIENT_BIDS: {
 					InvokerWrapper result = InvokerWrapper.catchInvocation(
+							() -> {
+								logger.info("Get client bids successfully invoked");
+								String clientId = (String) objIn.readObject();
+								return new Gson().toJson(auctionController.getClientBids(clientId));
+							}
+					);
+					return new Gson().toJson(result).getBytes();
+				}/************************************SMART Path Starts***********************************************/
+				case CREATE_SMART: {
+					InvokerWrapper result = InvokerWrapper.catchInvocation(
+							() -> {
+								logger.info("Get CREATE_SMART successfully invoked");
+								DualArgReplication<String, byte[]> dual =
+										(DualArgReplication<String, byte[]>) objIn.readObject();
+
+								smartContractController.createSmart(dual.getArg1(), dual.getArg2());
+
+								return VOID_ANSWER;
+							}
+					);
+					return new Gson().toJson(result).getBytes();
+				}
+				case REMOVE_SMART: {
+					InvokerWrapper result = InvokerWrapper.catchInvocation(
 						() -> {
-							logger.info("Get client bids successfully invoked");
-							String clientId = (String) objIn.readObject();
-							return new Gson().toJson(auctionController.getClientBids(clientId));
+							logger.info("Get REMOVE_SMART successfully invoked");
+							smartContractController.deleteSmartContract((String) objIn.readObject());
+							return VOID_ANSWER;
 						}
+					);
+					return new Gson().toJson(result).getBytes();
+				}
+				case LIST_SMART: {
+					InvokerWrapper result =InvokerWrapper.catchInvocation(
+							() -> {
+								logger.info("Get LIST_SMART successfully invoked");
+								return new Gson().toJson(smartContractController.ledgerSmartContracts());
+							}
+					);
+					return new Gson().toJson(result).getBytes();
+				}
+				case GET_SMART: {
+					InvokerWrapper result = InvokerWrapper.catchInvocation(
+							() -> {
+								logger.info("Get GET_SMART successfully invoked");
+								return new Gson().toJson(smartContractController.getSmartContract((String) objIn.readObject()));
+							}
 					);
 					return new Gson().toJson(result).getBytes();
 				}
 				default:
 					logger.error("Not implemented");
 					break;
+
 			}
 
 			objOut.flush();

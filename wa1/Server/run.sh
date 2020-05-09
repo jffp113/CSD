@@ -111,7 +111,7 @@ elif [ "$MODE" == "down" ]; then
   stopService
 elif [ "$MODE" == "build" ]; then
   buildService
-  buildService
+
 elif [ "$MODE" == "clear" ]; then
   clearDatabase
 elif [ "$MODE" == "restart" ]; then

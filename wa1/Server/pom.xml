@@ -32,6 +32,13 @@
 	</repositories>
 	<dependencies>
 		<dependency>
+			<groupId>org.python</groupId>
+			<artifactId>jython</artifactId>
+			<version>2.7.2</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/libs/jython-standalone-2.7.2.jar</systemPath>
+		</dependency>
+		<dependency>
 			<groupId>bftsmart</groupId>
 			<artifactId>bftsmart</artifactId>
 			<version>1.0</version>

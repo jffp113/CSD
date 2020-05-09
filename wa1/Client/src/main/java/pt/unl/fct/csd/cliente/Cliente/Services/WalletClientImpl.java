@@ -7,8 +7,10 @@ import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import pt.unl.fct.csd.cliente.Cliente.Handlers.RestTemplateHeaderModifierInterceptor;
 import pt.unl.fct.csd.cliente.Cliente.Handlers.RestTemplateResponseErrorHandler;
 import pt.unl.fct.csd.cliente.Cliente.Model.Auction;
 import pt.unl.fct.csd.cliente.Cliente.Model.Transaction;
@@ -16,6 +18,7 @@ import pt.unl.fct.csd.cliente.Cliente.exceptions.ServerAnswerException;
 
 import javax.annotation.PostConstruct;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 @Service
@@ -24,6 +27,9 @@ public class WalletClientImpl implements WalletClient {
 
     @Value("${client.server.url}")
     private String BASE;
+
+    @Value("${token}")
+    private String token;
 
     private static String WALLET_CONTROLLER =  "/money";
     private static String CREATE_MONEY = WALLET_CONTROLLER + "/create";
@@ -46,10 +52,16 @@ public class WalletClientImpl implements WalletClient {
         restTemplate = restTemplateBuilder
                 .errorHandler(new RestTemplateResponseErrorHandler())
                 .build();
+
+
     }
 
     @PostConstruct
-    public void init() {}
+    public void init() {
+        List<ClientHttpRequestInterceptor> list = new LinkedList<>();
+        list.add(new RestTemplateHeaderModifierInterceptor(token));
+        restTemplate.setInterceptors(list);
+    }
 
     @Override
     public void createMoney(String toUser, Long amount) throws ServerAnswerException {

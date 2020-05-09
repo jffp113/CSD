@@ -7,6 +7,7 @@ import java.io.ObjectInputStream;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
@@ -20,9 +21,11 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import pt.unl.fct.csd.cliente.Cliente.Handlers.RestTemplateHeaderModifierInterceptor;
 import pt.unl.fct.csd.cliente.Cliente.Handlers.RestTemplateResponseErrorHandler;
 import pt.unl.fct.csd.cliente.Cliente.Model.Auction;
 import pt.unl.fct.csd.cliente.Cliente.Model.Bid;
@@ -38,7 +41,9 @@ public class AuctionClientImpl implements AuctionClient {
     @Value("${client.server.url}")
     private String BASE;
 
-    
+	@Value("${token}")
+	private String token;
+
     //CONSTANTES
     private enum Path {
     	CREATE_AUCTION("/create/%s"),
@@ -70,13 +75,21 @@ public class AuctionClientImpl implements AuctionClient {
     public AuctionClientImpl(RestTemplateBuilder restTemplateBuilder,Environment env){
         System.setProperty("javax.net.ssl.trustStore", env.getProperty("client.ssl.trust-store"));
         System.setProperty("javax.net.ssl.trustStorePassword",env.getProperty("client.ssl.trust-store-password"));
+
         restTemplate = restTemplateBuilder
                 .errorHandler(new RestTemplateResponseErrorHandler())
                 .build();
+
+
+
     }
 
     @PostConstruct
-    public void init() {}
+    public void init() {
+		List<ClientHttpRequestInterceptor> list = new LinkedList<>();
+		list.add(new RestTemplateHeaderModifierInterceptor(token));
+		restTemplate.setInterceptors(list);
+	}
 
 
 	@Override
