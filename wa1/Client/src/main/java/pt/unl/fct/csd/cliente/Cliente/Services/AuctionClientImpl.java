@@ -1,25 +1,30 @@
 package pt.unl.fct.csd.cliente.Cliente.Services;
 
-import java.util.Arrays;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectInputStream;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
 
+import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import pt.unl.fct.csd.cliente.Cliente.Handlers.RestTemplateResponseErrorHandler;
-import pt.unl.fct.csd.cliente.Cliente.Model.AsyncReply;
 import pt.unl.fct.csd.cliente.Cliente.Model.Auction;
 import pt.unl.fct.csd.cliente.Cliente.Model.Bid;
+import pt.unl.fct.csd.cliente.Cliente.Model.InvokerWrapper;
+import pt.unl.fct.csd.cliente.Cliente.Model.SystemReply;
+import pt.unl.fct.csd.cliente.Cliente.exceptions.NoMajorityAnswerException;
 import pt.unl.fct.csd.cliente.Cliente.exceptions.ServerAnswerException;
 
 @Service
@@ -122,33 +127,55 @@ public class AuctionClientImpl implements AuctionClient {
 	private class ExtractAnswer<E> {
 
     	private E extractAnswerGet (String url) throws ServerAnswerException {
-			ResponseEntity<AsyncReply[]> response =
-					restTemplate.getForEntity(url, AsyncReply[].class);
+			ResponseEntity<SystemReply> response =
+					restTemplate.getForEntity(url, SystemReply.class);
 			return extractFromResponse(response);
 		}
 
 		private <V> E extractAnswerPost (String url, V objPost) throws ServerAnswerException {
-			ResponseEntity<AsyncReply[]> response =
-					restTemplate.postForEntity(url, objPost, AsyncReply[].class);
+			ResponseEntity<SystemReply> response =
+					restTemplate.postForEntity(url, objPost, SystemReply.class);
 			return extractFromResponse(response);
 		}
 
 		private <V> E extractAnswerPut (String url) throws ServerAnswerException {
-			ResponseEntity<AsyncReply[]> response =
-					restTemplate.exchange(url, HttpMethod.PUT, null, AsyncReply[].class);
+			ResponseEntity<SystemReply> response =
+					restTemplate.exchange(url, HttpMethod.PUT, null, SystemReply.class);
 			return extractFromResponse(response);
 		}
 
-		private E extractFromResponse (ResponseEntity<AsyncReply[]> response) throws ServerAnswerException {
-			AsyncReply[] replies = response.getBody();
-			assert replies != null;
-			List<byte[]> verifiedReplies = SignatureVerifyer.getVerifiedReplies(Arrays.asList(replies));
+		private E extractFromResponse (ResponseEntity<SystemReply> response) throws ServerAnswerException {
+			SystemReply systemReply = response.getBody();
+			assert systemReply != null;
 			try {
-				return new ReplyProcessor<E>(verifiedReplies).getMostFrequentAnswer();
+				if(!SignatureVerifier.isValidReply(systemReply))
+					throw new NoMajorityAnswerException();
+				return convertMostFrequentAnswer(systemReply.getReply()).getResultOrThrow();
 			} catch (Exception e) {
 				throw new ServerAnswerException(e.getMessage());
 			}
 		}
+
+		private InvokerWrapper<E> convertMostFrequentAnswer(byte[] answer) {
+			String ansStr = new String(answer);
+    		return new Gson().fromJson(ansStr, InvokerWrapper.class);
+    		/*try {
+				return tryToConvertMostFrequentAnswer(answer);
+			} catch (IOException | ClassNotFoundException e) {
+				e.printStackTrace();
+				System.exit(0);
+			}
+			return null;*/
+		}
+
+		/*private InvokerWrapper<E> tryToConvertMostFrequentAnswer(byte[] answer)
+				throws IOException, ClassNotFoundException {
+			try (ByteArrayInputStream byteIn = new ByteArrayInputStream(answer);
+				 ObjectInput objIn = new ObjectInputStream(byteIn)) {
+				//return (InvokerWrapper<E>) objIn.readObject();
+
+			}
+		}*/
 
 	}
 }

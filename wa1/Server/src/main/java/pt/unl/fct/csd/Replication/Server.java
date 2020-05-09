@@ -5,6 +5,7 @@ import bftsmart.tom.MessageContext;
 import bftsmart.tom.ServiceReplica;
 import bftsmart.tom.server.defaultservices.DefaultSingleRecoverable;
 import bftsmart.tom.util.TOMUtil;
+import com.google.gson.Gson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -73,6 +74,7 @@ public class Server extends DefaultSingleRecoverable implements Runnable{
 	}
 
 	private byte[] invokeCommand(byte[] command) {
+		InvokerWrapper<String> a;
 		try (ByteArrayInputStream byteIn = new ByteArrayInputStream(command);
 			 ObjectInput objIn = new ObjectInputStream(byteIn);
 			 ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
@@ -150,16 +152,15 @@ public class Server extends DefaultSingleRecoverable implements Runnable{
 
 				/************************************Auction Path Starts***********************************************/
 
-				case CREATE_AUCTION:objOut.
-						writeObject(InvokerWrapper.catchInvocation(
-								() -> {
-									logger.info("Create auction successfully invoked");
-									String clientId = (String) objIn.readObject();
-									return auctionController.createAuction(clientId);
-								}
-						));
-					logger.info("Auction finished");
-					break;
+				case CREATE_AUCTION:
+					InvokerWrapper<Long> l = InvokerWrapper.catchInvocation(
+							() -> {
+								logger.info("Create auction successfully invoked");
+								String clientId = (String) objIn.readObject();
+								return auctionController.createAuction(clientId);
+							}
+						);
+					return new Gson().toJson(l).getBytes();
 				case CREATE_BID_AUCTION: objOut.
 						writeObject(InvokerWrapper.catchInvocation(
 								() -> {
@@ -262,8 +263,7 @@ public class Server extends DefaultSingleRecoverable implements Runnable{
     }
 
     private byte[] sign(byte[] serverReply) throws Exception {
-	    byte[] hashed = TOMUtil.computeHash(serverReply);
-	    return TOMUtil.signMessage(keyLoader.loadPrivateKey(), hashed);
+	    return TOMUtil.signMessage(keyLoader.loadPrivateKey(), serverReply);
     }
 
 	@Override

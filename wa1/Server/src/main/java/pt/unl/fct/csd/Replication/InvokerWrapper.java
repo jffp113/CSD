@@ -4,7 +4,7 @@ import pt.unl.fct.csd.Exceptions.InternalServerError;
 
 import java.io.Serializable;
 
-public class InvokerWrapper<E extends Serializable> implements Serializable{
+public class InvokerWrapper<E> implements Serializable{
 
     private E result;
     private RuntimeException exception;
@@ -19,7 +19,7 @@ public class InvokerWrapper<E extends Serializable> implements Serializable{
         this.result = result;
     }
 
-    public static <E extends Serializable> InvokerWrapper<E> catchInvocation(Invoker<E> invoker){
+    public static <E> InvokerWrapper<E> catchInvocation(Invoker<E> invoker){
         try{
             return new InvokerWrapper<>(invoker.doStuff());
         } catch (RuntimeException e){
