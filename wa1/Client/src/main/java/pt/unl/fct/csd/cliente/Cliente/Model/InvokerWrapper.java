@@ -2,9 +2,9 @@ package pt.unl.fct.csd.cliente.Cliente.Model;
 
 import java.io.Serializable;
 
-public class InvokerWrapper<E> {
+public class InvokerWrapper {
 
-    private E result;
+    private String result;
     private Exception exception;
 
     private InvokerWrapper(Exception exception){
@@ -12,21 +12,30 @@ public class InvokerWrapper<E> {
         this.result = null;
     }
 
-    private InvokerWrapper(E result){
+    private InvokerWrapper(String result){
         this.exception = null;
         this.result = result;
     }
 
-    /*public static <E extends Serializable> InvokerWrapper<E> catchInvocation(Invoker<E> invoker){
-        try{
-            return new InvokerWrapper<>(invoker.doStuff());
-        } catch (Exception e){
-            e.printStackTrace();
-            return new InvokerWrapper<>(e);
-        }
-    }*/
+    private InvokerWrapper() {}
 
-    public E getResultOrThrow() throws Exception {
+    public String getResult() {
+        return result;
+    }
+
+    public void setResult(String resultJson) {
+        this.result = resultJson;
+    }
+
+    public Exception getException() {
+        return exception;
+    }
+
+    public void setException(Exception exception) {
+        this.exception = exception;
+    }
+
+    public String getResultOrThrow() throws Exception {
         if(exception != null)
            throw exception;
 

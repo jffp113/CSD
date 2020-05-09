@@ -1,5 +1,6 @@
 package pt.unl.fct.csd.cliente.Cliente.Services;
 
+import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -53,18 +54,19 @@ public class WalletClientImpl implements WalletClient {
     @Override
     public void createMoney(String toUser, Long amount) throws ServerAnswerException {
         Transaction transaction = new Transaction(toUser,amount);
-        new ExtractAnswer<Void>().extractAnswerPost(BASE + CREATE_MONEY, transaction, restTemplate);
+        new ExtractAnswer().extractAnswerPost(BASE + CREATE_MONEY, transaction, restTemplate);
     }
 
     @Override
     public void transferMoney(String fromUser, String toUser, Long amount) throws ServerAnswerException {
         Transaction transaction = new Transaction(fromUser,toUser,amount);
-        new ExtractAnswer<Void>().extractAnswerPost(BASE + TRANSFER_MONEY, transaction, restTemplate);
+        new ExtractAnswer().extractAnswerPost(BASE + TRANSFER_MONEY, transaction, restTemplate);
     }
 
     @Override
     public Long currentAmount(String userID) throws ServerAnswerException{
-        return new ExtractAnswer<Double>().extractAnswerGet(BASE + GET_MONEY, restTemplate).longValue();
+        String longJson = new ExtractAnswer().extractAnswerGet(BASE + GET_MONEY, restTemplate);
+        return Long.valueOf(longJson);
     }
 
     @Override
@@ -78,7 +80,8 @@ public class WalletClientImpl implements WalletClient {
     }
 
     private List<Transaction> getLedgerFromPath(String path) throws ServerAnswerException {
-        return Arrays.asList(new ExtractAnswer<Transaction[]>().extractAnswerGet(path, restTemplate));
+        String transactionsJson = new ExtractAnswer().extractAnswerGet(path, restTemplate);
+        return Arrays.asList(new Gson().fromJson(transactionsJson, Transaction[].class));
     }
 
 }

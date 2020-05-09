@@ -20,6 +20,8 @@ import pt.unl.fct.csd.Model.*;
 
 import javax.annotation.PostConstruct;
 import java.io.*;
+import java.util.LinkedList;
+import java.util.List;
 
 @PropertySource("classpath:application.properties")
 @Component
@@ -138,7 +140,8 @@ public class Server extends DefaultSingleRecoverable implements Runnable{
 					InvokerWrapper<Transaction[]> result = InvokerWrapper.catchInvocation(
 							() -> {
 								logger.info("Successfully completed ledgerOfClientTransfers");
-								return (Transaction[]) walletController.ledgerOfClientTransfers().toArray();
+								List<Transaction> transactions = walletController.ledgerOfClientTransfers();
+								return transactions.toArray(new Transaction[0]);
 							}
 						);
 					return new Gson().toJson(result).getBytes();
