@@ -1,18 +1,21 @@
-#WA3
-
-Under "wa1/Server/Auditoria" can be found server auditing.
+# WA4
 
 The name "wa1" does not correspond to the version of the project.
 
-Project Version **WA3**
+Project Version **WA4**
 
-#Requisites
+# WA4 What was implemented
 
--Docker
--Maven
--Java 11+ (For compilation, not tested for Java 8 to 10)
+- Smart Contracts
+- Async signed Replies sent to client and verified by them.
 
-#Compile and Run project
+# Requisites
+
+- Docker
+- Maven
+- Java 11+ (For compilation, not tested for Java 8 to 10)
+
+# Compile and Run project Server
 
 There is a script that allows you to compile and build the project. You can concatenate commands:
 
@@ -61,12 +64,6 @@ Usage:
       - 'restart' - restart the service
       - 'build' - container image creation for project and database
 ```
-
-#System Analyses
-
-Report under development here:
-
-https://www.overleaf.com/9923788165bjzmmngqhkps
 
 
 
