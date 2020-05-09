@@ -23,10 +23,12 @@ public interface CollectiveAuctionController {
     String GET_AUCTION_BIDS = "/{auctionId}/bids";
     String GET_CLIENT_BIDS = "/client/{clientId}";
     
-    @PostMapping(value = CREATE_AUCTION)
+    @PostMapping(value = CREATE_AUCTION,
+                produces = APPLICATION_JSON_VALUE)
     SystemReply createAuction(@PathVariable("ownerId") String ownerId) throws InterruptedException;
 
-    @PutMapping(value = TERMINATE_AUCTION)
+    @PutMapping(value = TERMINATE_AUCTION,
+                produces = APPLICATION_JSON_VALUE)
     SystemReply terminateAuction(@PathVariable("auctionId") long auctionId);
    
     @GetMapping(

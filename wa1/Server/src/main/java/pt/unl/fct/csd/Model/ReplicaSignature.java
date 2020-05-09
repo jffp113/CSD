@@ -2,12 +2,30 @@ package pt.unl.fct.csd.Model;
 
 public class ReplicaSignature {
 
-    private final int replicaNumber;
+    private int replicaNumber;
 
-    private final byte[] signature;
+    private byte[] signature;
 
     public ReplicaSignature(int replicaNumber, byte[] signature) {
         this.replicaNumber = replicaNumber;
+        this.signature = signature;
+    }
+
+    public ReplicaSignature() {}
+
+    public void setReplicaNumber(int replicaNumber) {
+        this.replicaNumber = replicaNumber;
+    }
+
+    public int getReplicaNumber() {
+        return replicaNumber;
+    }
+
+    public byte[] getSignature() {
+        return signature;
+    }
+
+    public void setSignature(byte[] signature) {
         this.signature = signature;
     }
 }

@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import pt.unl.fct.csd.cliente.Cliente.Handlers.RestTemplateResponseErrorHandler;
+import pt.unl.fct.csd.cliente.Cliente.Model.Auction;
 import pt.unl.fct.csd.cliente.Cliente.Model.Transaction;
 import pt.unl.fct.csd.cliente.Cliente.exceptions.ServerAnswerException;
 
@@ -52,21 +53,18 @@ public class WalletClientImpl implements WalletClient {
     @Override
     public void createMoney(String toUser, Long amount) throws ServerAnswerException {
         Transaction transaction = new Transaction(toUser,amount);
-        ResponseEntity<String> response = restTemplate.postForEntity(BASE + CREATE_MONEY, transaction, String.class);
-        new HandleServerAnswer<Void>().processServerAnswer(response, Void.class);
+        new ExtractAnswer<Void>().extractAnswerPost(BASE + CREATE_MONEY, transaction, restTemplate);
     }
 
     @Override
     public void transferMoney(String fromUser, String toUser, Long amount) throws ServerAnswerException {
         Transaction transaction = new Transaction(fromUser,toUser,amount);
-        ResponseEntity<String> response = restTemplate.postForEntity(BASE + TRANSFER_MONEY, transaction, String.class);
-        new HandleServerAnswer<Void>().processServerAnswer(response, Void.class);
+        new ExtractAnswer<Void>().extractAnswerPost(BASE + TRANSFER_MONEY, transaction, restTemplate);
     }
 
     @Override
     public Long currentAmount(String userID) throws ServerAnswerException{
-        ResponseEntity<String> response = restTemplate.getForEntity(BASE + GET_MONEY + userID, String.class);
-        return new HandleServerAnswer<Long>().processServerAnswer(response, Long.class);
+        return new ExtractAnswer<Double>().extractAnswerGet(BASE + GET_MONEY, restTemplate).longValue();
     }
 
     @Override
@@ -80,10 +78,7 @@ public class WalletClientImpl implements WalletClient {
     }
 
     private List<Transaction> getLedgerFromPath(String path) throws ServerAnswerException {
-        ResponseEntity<String> response = restTemplate.getForEntity(path, String.class);
-        Transaction[] transactions = new HandleServerAnswer<Transaction[]>().
-                processServerAnswer(response, Transaction[].class);
-        return Arrays.asList(transactions);
+        return Arrays.asList(new ExtractAnswer<Transaction[]>().extractAnswerGet(path, restTemplate));
     }
 
 }

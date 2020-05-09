@@ -58,13 +58,20 @@
             <version>0.0.20131108.vaadin1</version>
             <scope>compile</scope>
         </dependency>
-        <dependency>
+
+		<dependency>
             <groupId>bftsmart</groupId>
             <artifactId>bftsmart</artifactId>
             <version>1.0</version>
             <scope>compile</scope>
         </dependency>
 
+		<!-- https://mvnrepository.com/artifact/commons-codec/commons-codec -->
+		<dependency>
+			<groupId>commons-codec</groupId>
+			<artifactId>commons-codec</artifactId>
+			<version>1.9</version>
+		</dependency>
 
     </dependencies>
 	<repositories>
@@ -76,6 +83,18 @@
 				<enabled>true</enabled>
 			</snapshots>
 		</repository>
+
+		<repository>
+			<id>CSD</id>
+			<url>https://pkgs.dev.azure.com/jfpereira/Teste/_packaging/CSD/maven/v1</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</repository>
+
 	</repositories>
 	<build>
 		<plugins>

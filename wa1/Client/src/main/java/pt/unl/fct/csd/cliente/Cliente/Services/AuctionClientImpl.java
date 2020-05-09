@@ -4,11 +4,15 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectInputStream;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -78,104 +82,50 @@ public class AuctionClientImpl implements AuctionClient {
 	@Override
 	public Long createAuction(String ownerId) throws ServerAnswerException {
 		String urlWithId = String.format(Path.CREATE_AUCTION.url, BASE, ownerId);
-		return new ExtractAnswer<Long>().extractAnswerPost(urlWithId, null);
-	}
+		return new ExtractAnswer<Double>().extractAnswerPost(urlWithId, null, restTemplate).longValue();
+    }
 
 	@Override
 	public void terminateAuction(long auctionId) throws ServerAnswerException {
 		String urlWithId = String.format(Path.TERMINATE_AUCTION.url, BASE, auctionId);
-		new ExtractAnswer<Long>().extractAnswerPut(urlWithId);
+		new ExtractAnswer<Long>().extractAnswerPut(urlWithId, restTemplate);
 	}
 
 	@Override
 	public List<Auction> getOpenAuctions() throws ServerAnswerException {
 		String urlComplete = String.format(Path.GET_OPEN_AUCTIONS.url, BASE);
-		return new ExtractAnswer<List<Auction>>().extractAnswerGet(urlComplete);
+		return Arrays.asList(new ExtractAnswer<Auction[]>().extractAnswerGet(urlComplete, restTemplate));
 	}
 
 	@Override
 	public List<Auction> getClosedAuctions() throws ServerAnswerException {
 		String urlComplete = String.format(Path.GET_CLOSED_AUCTIONS.url, BASE);
-		return new ExtractAnswer<List<Auction>>().extractAnswerGet(urlComplete);
+		return Arrays.asList(new ExtractAnswer<Auction[]>().extractAnswerGet(urlComplete, restTemplate));
 	}
 
 	@Override
 	public List<Bid> getAuctionBids(long auctionId) throws ServerAnswerException {
 		String urlComplete = String.format(Path.GET_AUCTION_BIDS.url, BASE, auctionId);
-		return new ExtractAnswer<List<Bid>>().extractAnswerGet(urlComplete);
+		return Arrays.asList(new ExtractAnswer<Bid[]>().extractAnswerGet(urlComplete, restTemplate));
 	}
 
 	@Override
 	public List<Bid> getClientBids(String clientId) throws ServerAnswerException {
 		String urlComplete = String.format(Path.GET_CLIENT_BIDS.url, BASE, clientId);
-		return new ExtractAnswer<List<Bid>>().extractAnswerGet(urlComplete);
+		return Arrays.asList(new ExtractAnswer<Bid[]>().extractAnswerGet(urlComplete, restTemplate));
 	}
 
 	@Override
 	public Bid getClosedBid(long auctionId) throws ServerAnswerException {
 		String urlWithId = String.format(Path.GET_CLOSE_BID.url, BASE, auctionId);
-		return new ExtractAnswer<Bid>().extractAnswerGet(urlWithId);
+		return new ExtractAnswer<Bid>().extractAnswerGet(urlWithId, restTemplate);
 	}
 
 	@Override
 	public Long createBid(String bidderId, Long auctionId, int value) throws ServerAnswerException {
 		Bid bid = new Bid(bidderId, auctionId, value);
 		String urlComplete = String.format(Path.CREATE_BID.url, BASE);
-		return new ExtractAnswer<Long>().extractAnswerPost(urlComplete, bid);
+		return new ExtractAnswer<Double>().extractAnswerPost(urlComplete, bid, restTemplate).longValue();
 	}
 
-	private class ExtractAnswer<E> {
-
-    	private E extractAnswerGet (String url) throws ServerAnswerException {
-			ResponseEntity<SystemReply> response =
-					restTemplate.getForEntity(url, SystemReply.class);
-			return extractFromResponse(response);
-		}
-
-		private <V> E extractAnswerPost (String url, V objPost) throws ServerAnswerException {
-			ResponseEntity<SystemReply> response =
-					restTemplate.postForEntity(url, objPost, SystemReply.class);
-			return extractFromResponse(response);
-		}
-
-		private <V> E extractAnswerPut (String url) throws ServerAnswerException {
-			ResponseEntity<SystemReply> response =
-					restTemplate.exchange(url, HttpMethod.PUT, null, SystemReply.class);
-			return extractFromResponse(response);
-		}
-
-		private E extractFromResponse (ResponseEntity<SystemReply> response) throws ServerAnswerException {
-			SystemReply systemReply = response.getBody();
-			assert systemReply != null;
-			try {
-				if(!SignatureVerifier.isValidReply(systemReply))
-					throw new NoMajorityAnswerException();
-				return convertMostFrequentAnswer(systemReply.getReply()).getResultOrThrow();
-			} catch (Exception e) {
-				throw new ServerAnswerException(e.getMessage());
-			}
-		}
-
-		private InvokerWrapper<E> convertMostFrequentAnswer(byte[] answer) {
-			String ansStr = new String(answer);
-    		return new Gson().fromJson(ansStr, InvokerWrapper.class);
-    		/*try {
-				return tryToConvertMostFrequentAnswer(answer);
-			} catch (IOException | ClassNotFoundException e) {
-				e.printStackTrace();
-				System.exit(0);
-			}
-			return null;*/
-		}
-
-		/*private InvokerWrapper<E> tryToConvertMostFrequentAnswer(byte[] answer)
-				throws IOException, ClassNotFoundException {
-			try (ByteArrayInputStream byteIn = new ByteArrayInputStream(answer);
-				 ObjectInput objIn = new ObjectInputStream(byteIn)) {
-				//return (InvokerWrapper<E>) objIn.readObject();
-
-			}
-		}*/
-
-	}
 }
