@@ -19,7 +19,7 @@ public class SignatureVerifier {
         byte[] reply = systemReply.getReply();
         return systemReply.getSignatures().stream()
                 .filter(sign -> isValid(sign, systemReply.getReply()))
-                .count() >= 3; //TODO not static quorum size;
+                .count() >= 2; //TODO not static quorum size;
     }
 
     private static boolean isValid(ReplicaSignature signature, byte[] reply) {

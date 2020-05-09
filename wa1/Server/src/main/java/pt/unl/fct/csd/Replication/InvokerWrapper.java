@@ -4,9 +4,9 @@ import pt.unl.fct.csd.Exceptions.InternalServerError;
 
 import java.io.Serializable;
 
-public class InvokerWrapper<E> implements Serializable{
+public class InvokerWrapper implements Serializable{
 
-    private E result;
+    private String result;
     private RuntimeException exception;
 
     private InvokerWrapper(RuntimeException exception){
@@ -14,24 +14,24 @@ public class InvokerWrapper<E> implements Serializable{
         this.result = null;
     }
 
-    private InvokerWrapper(E result){
+    private InvokerWrapper(String result){
         this.exception = null;
         this.result = result;
     }
 
-    public static <E> InvokerWrapper<E> catchInvocation(Invoker<E> invoker){
+    public static InvokerWrapper catchInvocation(Invoker invoker){
         try{
-            return new InvokerWrapper<>(invoker.doStuff());
+            return new InvokerWrapper(invoker.doStuff());
         } catch (RuntimeException e){
             e.printStackTrace();
-            return new InvokerWrapper<>(e);
+            return new InvokerWrapper(e);
         } catch (Exception e){
             e.printStackTrace();
-            return new InvokerWrapper<>(new InternalServerError());
+            return new InvokerWrapper(new InternalServerError());
         }
     }
 
-    public E getResultOrThrow() {
+    public String getResultOrThrow() {
         if(exception != null)
            throw exception;
 

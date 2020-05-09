@@ -2,7 +2,7 @@ package pt.unl.fct.csd.Replication;
 
 import java.io.IOException;
 
-public interface Invoker<T> {
+public interface Invoker {
 
-    T doStuff() throws IOException, ClassNotFoundException;
+    String doStuff() throws IOException, ClassNotFoundException;
 }
