@@ -5,8 +5,7 @@ Project Version **WA4**
 
 # Change List
 
-9/05/2020 ->  Reduce Container size from 541 MB to 256 MB to fit better in sgx
-
+- 9/05/2020 ->  Reduce Container size from 541 MB to 256 MB to fit better in sgx
 
 
 # WA4 What was implemented

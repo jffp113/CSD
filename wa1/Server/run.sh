@@ -34,7 +34,7 @@ function startService() {
     echo "Service Database Started"
 
     echo "Waiting 1 minute before starting replicas"
-    #sleep 60
+    sleep 60
     echo "Starting replicas"
 
 
