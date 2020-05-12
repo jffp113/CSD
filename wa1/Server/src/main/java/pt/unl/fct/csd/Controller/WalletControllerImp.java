@@ -8,10 +8,12 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import pt.unl.fct.csd.Exceptions.*;
 import pt.unl.fct.csd.Model.Transaction;
+import pt.unl.fct.csd.Model.UniqueNumberGenerator;
 import pt.unl.fct.csd.Model.UserAccount;
 import pt.unl.fct.csd.Repository.TransactionRepository;
 import pt.unl.fct.csd.Repository.UserAccountRepository;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
@@ -39,12 +41,12 @@ public class WalletControllerImp implements WalletController {
         account.addMoney(transaction.getAmount());
         saveUser(account);
         transaction.setFrom(SYSTEM_RESERVED_USER);
+        transaction.setId(UniqueNumberGenerator.getUniqueNumber());
         transactionRepository.save(transaction);
     }
 
     private UserAccount getOrCreateUser (String userId) {
         try {
-            //return new UserCommonsImpl().getUserAccount(userId);
             return getUserAccount(userId);
         } catch (UserDoesNotExistException e) {
             return new UserAccount(userId, 0L);
@@ -86,7 +88,13 @@ public class WalletControllerImp implements WalletController {
 
     @Override
     public List<Transaction> ledgerOfClientTransfers() {
-        return transactionRepository.findAll();
+        List<Transaction> result = new LinkedList<>();
+        for(Transaction transaction : transactionRepository.findAll()){
+            result.add(transaction);
+        }
+
+        //transactionRepository.
+        return result;
     }
 
     @Override
@@ -120,6 +128,7 @@ public class WalletControllerImp implements WalletController {
         t.setFrom(from);
         t.setTo(to);
         t.setAmount(amount);
+        t.setId(UniqueNumberGenerator.getUniqueNumber());
         transactionRepository.save(t);
     }
 

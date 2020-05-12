@@ -1,7 +1,7 @@
 package pt.unl.fct.csd.Model;
 
 import java.util.Collection;
-import java.util.Set;
+
 
 public class SystemReply {
 

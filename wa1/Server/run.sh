@@ -29,12 +29,12 @@ function startService() {
     for (( i=1; i<=(($1 + $2)); i++ ))
     do
       #rm -rf "$(pwd)/Database/db${i}"
-      docker run --rm -d --network=csd -v "$(pwd)/Database/db${i}":/var/lib/mysql -e MYSQL_ROOT_PASSWORD=toor --name "db${i}" csddatabase
+      docker run --rm -d --network=csd -v "$(pwd)/Database/db${i}":/data --name "db${i}" redis:alpine
     done
     echo "Service Database Started"
 
     echo "Waiting 1 minute before starting replicas"
-    sleep 60
+    #sleep 60
     echo "Starting replicas"
 
 
@@ -44,7 +44,7 @@ function startService() {
     do
       echo "Starting correct replica $i"
 
-      docker run --rm -d --network=csd -p $((SERVER_PORT + i)):${SERVER_PORT}  -e MYSQL_HOST="db${i}" \
+      docker run --rm -d --network=csd -p $((SERVER_PORT + i)):${SERVER_PORT}  -e DB_HOST="db${i}" \
        -e "REPLICA_ID=${REPLICA_ID}"  -e "SERVER_PORT=${SERVER_PORT}" -e "REPLICA_BYZ=false" --name "replica${i}" server
       ((REPLICA_ID++))
       ((END_IP++))
@@ -77,9 +77,9 @@ function clearDatabase() {
 
 function buildService() {
   mvn clean package --settings settings.xml -DskipTests
-  cd Database
-  docker build -t csddatabase .
-  cd ..
+  #cd Database
+  #docker build -t csddatabase .
+  #cd ..
 }
 
 if (! docker stats --no-stream); then

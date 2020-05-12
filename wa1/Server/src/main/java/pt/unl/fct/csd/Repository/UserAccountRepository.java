@@ -1,10 +1,10 @@
 package pt.unl.fct.csd.Repository;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+
+import org.springframework.data.repository.CrudRepository;
 import pt.unl.fct.csd.Model.UserAccount;
 
-@Repository
-public interface UserAccountRepository extends JpaRepository<UserAccount,String> {
+
+public interface UserAccountRepository extends CrudRepository<UserAccount,String> {
 
 }

@@ -1,16 +1,21 @@
 package pt.unl.fct.csd.Model;
 
-import javax.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.redis.core.RedisHash;
+import org.springframework.data.redis.core.index.Indexed;
+
 import java.io.Serializable;
 
-@Entity
-@Table
+@RedisHash("UserAccount")
+@Data
 public class UserAccount implements Serializable {
 
     @Id
+    @Indexed
     private String id;
 
-    @Column(name = "money", nullable = false)
     private Long money;
 
     public UserAccount(){

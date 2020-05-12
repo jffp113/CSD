@@ -1,29 +1,28 @@
 package pt.unl.fct.csd.Model;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.redis.core.RedisHash;
+import org.springframework.data.redis.core.index.Indexed;
+
+
 import java.io.Serializable;
 
-@Entity
-@Table
+@RedisHash("Bid")
 public class Bid implements Serializable {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 
-	@Column(name = "bidderId", nullable = false)
+	@Indexed
 	private String bidderId;
-	
-	@Column(name = "auctionId", nullable = false)
+
+	@Indexed
 	private Long auctionId;
 
-	@Column(name = "value", nullable = false)
 	private Long value;
+
+	public Bid() {
+	}
 
 	public Long getAuctionId() {
 		return auctionId;

@@ -6,10 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import pt.unl.fct.csd.Exceptions.*;
-import pt.unl.fct.csd.Model.Auction;
-import pt.unl.fct.csd.Model.Bid;
-import pt.unl.fct.csd.Model.Transaction;
-import pt.unl.fct.csd.Model.UserAccount;
+import pt.unl.fct.csd.Model.*;
 import pt.unl.fct.csd.Repository.AuctionRepository;
 import pt.unl.fct.csd.Repository.BidRepository;
 import pt.unl.fct.csd.Repository.UserAccountRepository;
@@ -103,7 +100,6 @@ public class AuctionControllerImp implements AuctionController {
 	}
 
 	private UserAccount getUser(String userId) {
-		//return new UserCommonsImpl().getUserAccount(userId);
 		return getUserAccount(userId);
 	}
 

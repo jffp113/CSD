@@ -1,14 +1,12 @@
 package pt.unl.fct.csd.Repository;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+import org.springframework.data.repository.CrudRepository;
 
 import pt.unl.fct.csd.Model.Auction;
 
 import java.util.List;
 
-@Repository
-public interface AuctionRepository extends JpaRepository<Auction, Long> {
+public interface AuctionRepository extends CrudRepository<Auction, Long> {
 
 	List<Auction> getAllByisClosedFalse();
 	

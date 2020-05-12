@@ -1,6 +1,8 @@
 package pt.unl.fct.csd.cliente.Cliente.Model;
 
 
+import org.springframework.stereotype.Indexed;
+
 public class UserAccount {
 
     private String id;

@@ -179,6 +179,7 @@ public class Server extends DefaultSingleRecoverable implements Runnable{
 							() -> {
 								logger.info("Create auction bid successfully invoked");
 								Bid bid = (Bid) objIn.readObject();
+								bid.setId(UniqueNumberGenerator.getUniqueNumber());
 								return String.valueOf(auctionController.makeBid(bid));
 							}
 					);

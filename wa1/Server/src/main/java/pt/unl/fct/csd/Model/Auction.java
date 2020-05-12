@@ -1,26 +1,28 @@
 package pt.unl.fct.csd.Model;
 
-import javax.persistence.*;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.redis.core.RedisHash;
+import org.springframework.data.redis.core.index.Indexed;
+
+
 import java.io.Serializable;
 
-@Entity
-@Table
+@RedisHash("Auction")
 public class Auction implements Serializable {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 
-	@Column(name = "ownerId", nullable = false)
 	private String ownerId;
 
-	@Column(name = "closingBidId", nullable = true)
 	private Long lastBidId;
-	
-	@Column(name = "isClosed", nullable = false)
+
+	@Indexed
 	private boolean isClosed = false;
 
-	public Auction() {}
+	public Auction() {
+		id = UniqueNumberGenerator.getUniqueNumber();
+	}
 	
 	public Long getId() {
 		return id;
