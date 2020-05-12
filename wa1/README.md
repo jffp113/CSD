@@ -6,6 +6,7 @@ Project Version **WA4**
 # Change List
 
 - 9/05/2020 ->  Reduce Container size from 541 MB to 256 MB to fit better in sgx
+- 12/05/2020 -> Change database from MySQL to Redis
 
 
 # WA4 What was implemented
