@@ -44,7 +44,7 @@ function startService() {
     do
       echo "Starting correct replica $i"
 
-      docker run --rm -d --network=csd -p $((SERVER_PORT + i)):${SERVER_PORT}  -e DB_HOST="db${i}" \
+      docker run --rm -ti --network=csd -p $((SERVER_PORT + i)):${SERVER_PORT} -e SCONE_VERSION=1 -e SCONE_LOG=7 -e SCONE_MODE=SIM -e DB_HOST="db${i}" \
        -e "REPLICA_ID=${REPLICA_ID}"  -e "SERVER_PORT=${SERVER_PORT}" -e "REPLICA_BYZ=false" --name "replica${i}" server
       ((REPLICA_ID++))
       ((END_IP++))

@@ -1,4 +1,5 @@
-FROM adoptopenjdk/openjdk12:jre-12.0.2_10-alpine
+#FROM adoptopenjdk/openjdk12:jre-12.0.2_10-alpine
+FROM sconecuratedimages/apps:openjdk-11-alpine
 COPY ./config/ ./config
 COPY ./libs/ ./libs
 COPY ./Server-files/ ./Server-files/
