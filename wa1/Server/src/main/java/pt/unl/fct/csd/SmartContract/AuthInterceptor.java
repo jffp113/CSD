@@ -38,10 +38,7 @@ public class AuthInterceptor extends HandlerInterceptorAdapter {
 	public boolean preHandle(HttpServletRequest request,
 							 HttpServletResponse response, Object handler) throws Exception {
 		if(!smartcontractOn){
-			ScriptEngineManager manager = new ScriptEngineManager();
-			ScriptEngine engine = manager.getEngineByName("javascript");
-			engine.eval("var result = true");
-			return (Boolean) engine.get("result");
+			return true;
 		}
 
 		String token =  request.getHeader("token");
