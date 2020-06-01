@@ -1,11 +1,5 @@
 package pt.unl.fct.csd.cliente.Cliente.Services;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.ObjectInput;
-import java.io.ObjectInputStream;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -13,14 +7,11 @@ import java.util.List;
 import javax.annotation.PostConstruct;
 
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -29,10 +20,9 @@ import pt.unl.fct.csd.cliente.Cliente.Handlers.RestTemplateHeaderModifierInterce
 import pt.unl.fct.csd.cliente.Cliente.Handlers.RestTemplateResponseErrorHandler;
 import pt.unl.fct.csd.cliente.Cliente.Model.Auction;
 import pt.unl.fct.csd.cliente.Cliente.Model.Bid;
-import pt.unl.fct.csd.cliente.Cliente.Model.InvokerWrapper;
-import pt.unl.fct.csd.cliente.Cliente.Model.SystemReply;
-import pt.unl.fct.csd.cliente.Cliente.exceptions.NoMajorityAnswerException;
 import pt.unl.fct.csd.cliente.Cliente.exceptions.ServerAnswerException;
+
+import static pt.unl.fct.csd.cliente.Cliente.Services.Path.*;
 
 @Service
 @PropertySource("classpath:application.properties")
@@ -43,27 +33,12 @@ public class AuctionClientImpl implements AuctionClient {
 
 	@Value("${token}")
 	private String token;
-
-    //CONSTANTES
-    private enum Path {
-    	CREATE_AUCTION("/create/%s"),
-    	CREATE_BID("/create/bid"),
-    	TERMINATE_AUCTION("/terminate/%s"),
-    	GET_CLOSE_BID("/%d/closebid"),
-    	GET_OPEN_AUCTIONS("/open"),
-    	GET_CLOSED_AUCTIONS("/closed"),
-    	GET_AUCTION_BIDS("/%d/bids"),
-    	GET_CLIENT_BIDS("/client/%s");
-    	
-    	private static final String BASE_URL = "/auctions";
-    	private final String url;
-    	
-    	Path(String url) {
-    		this.url = "%s" + BASE_URL + url;
-    	}
-    }
     
     private RestTemplate restTemplate;
+
+    private ExtractAnswer extractor;
+
+    private final Gson g = new Gson();
 
     static {
         //For localhost testing only
@@ -79,9 +54,6 @@ public class AuctionClientImpl implements AuctionClient {
         restTemplate = restTemplateBuilder
                 .errorHandler(new RestTemplateResponseErrorHandler())
                 .build();
-
-
-
     }
 
     @PostConstruct
@@ -91,60 +63,62 @@ public class AuctionClientImpl implements AuctionClient {
 		restTemplate.setInterceptors(list);
 	}
 
+	private ExtractAnswer getExtractor() {
+    	if(extractor == null)
+    		extractor = new ExtractAnswer(BASE, restTemplate);
+    	return extractor;
+	}
 
 	@Override
 	public Long createAuction(String ownerId) throws ServerAnswerException {
-		String urlWithId = String.format(Path.CREATE_AUCTION.url, BASE, ownerId);
-		String longJson = new ExtractAnswer().extractAnswerPost(urlWithId, null, restTemplate);
+		String uid = String.format("{ \"ownerId\": \"%s\"}", ownerId);
+		String longJson = getExtractor().extractOrderedAnswer(CREATE_AUCTION.name(), uid);
 		return Long.valueOf(longJson);
     }
 
 	@Override
 	public void terminateAuction(long auctionId) throws ServerAnswerException {
-		String urlWithId = String.format(Path.TERMINATE_AUCTION.url, BASE, auctionId);
-		new ExtractAnswer().extractAnswerPut(urlWithId, restTemplate);
+    	String id = String.format("{ \"auctionId\": \"%d\"}", auctionId);
+		getExtractor().extractOrderedAnswer(TERMINATE_AUCTION.name(), id);
 	}
 
 	@Override
 	public List<Auction> getOpenAuctions() throws ServerAnswerException {
-		String urlComplete = String.format(Path.GET_OPEN_AUCTIONS.url, BASE);
-		String openJson = new ExtractAnswer().extractAnswerGet(urlComplete, restTemplate);
+		String openJson = getExtractor().extractUnorderedAnswer(GET_OPEN_AUCTIONS.name(), "");
 		return Arrays.asList(new Gson().fromJson(openJson, Auction[].class));
 	}
 
 	@Override
 	public List<Auction> getClosedAuctions() throws ServerAnswerException {
-		String urlComplete = String.format(Path.GET_CLOSED_AUCTIONS.url, BASE);
-		String closedJson = new ExtractAnswer().extractAnswerGet(urlComplete, restTemplate);
+		String closedJson = getExtractor().extractUnorderedAnswer(GET_CLOSED_AUCTIONS.name(), "");
 		return Arrays.asList(new Gson().fromJson(closedJson, Auction[].class));
 	}
 
 	@Override
 	public List<Bid> getAuctionBids(long auctionId) throws ServerAnswerException {
-		String urlComplete = String.format(Path.GET_AUCTION_BIDS.url, BASE, auctionId);
-		String bidsJson = new ExtractAnswer().extractAnswerGet(urlComplete, restTemplate);
+		String id = String.format("{ \"auctionId\": \"%d\"}", auctionId);
+		String bidsJson = getExtractor().extractUnorderedAnswer(GET_AUCTION_BIDS.name(), id);
 		return Arrays.asList(new Gson().fromJson(bidsJson, Bid[].class));
 	}
 
 	@Override
 	public List<Bid> getClientBids(String clientId) throws ServerAnswerException {
-		String urlComplete = String.format(Path.GET_CLIENT_BIDS.url, BASE, clientId);
-		String bidsJson = new ExtractAnswer().extractAnswerGet(urlComplete, restTemplate);
+		String id = String.format("{ \"clientId\": \"%s\"}", clientId);
+		String bidsJson = getExtractor().extractUnorderedAnswer(GET_CLIENT_BIDS.name(), id);
 		return Arrays.asList(new Gson().fromJson(bidsJson, Bid[].class));
 	}
 
 	@Override
 	public Bid getClosedBid(long auctionId) throws ServerAnswerException {
-		String urlWithId = String.format(Path.GET_CLOSE_BID.url, BASE, auctionId);
-		String bidJson = new ExtractAnswer().extractAnswerGet(urlWithId, restTemplate);
+		String id = String.format("{ \"auctionId\": \"%d\"}", auctionId);
+		String bidJson = getExtractor().extractUnorderedAnswer(GET_CLOSE_BID.name(), id);
 		return new Gson().fromJson(bidJson, Bid.class);
 	}
 
 	@Override
 	public Long createBid(String bidderId, Long auctionId, int value) throws ServerAnswerException {
-		Bid bid = new Bid(bidderId, auctionId, value);
-		String urlComplete = String.format(Path.CREATE_BID.url, BASE);
-		String longJson = new ExtractAnswer().extractAnswerPost(urlComplete, bid, restTemplate);
+		String bid = g.toJson(new Bid(bidderId, auctionId, value));
+		String longJson = getExtractor().extractOrderedAnswer(CREATE_BID_AUCTION.name(), bid);
 		return Long.valueOf(longJson);
 	}
 

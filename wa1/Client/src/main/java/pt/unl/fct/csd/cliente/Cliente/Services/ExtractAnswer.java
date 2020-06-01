@@ -1,7 +1,6 @@
 package pt.unl.fct.csd.cliente.Cliente.Services;
 
 import com.google.gson.Gson;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 import pt.unl.fct.csd.cliente.Cliente.Model.InvokerWrapper;
@@ -11,25 +10,40 @@ import pt.unl.fct.csd.cliente.Cliente.exceptions.ServerAnswerException;
 
 public class ExtractAnswer {
 
-    public String extractAnswerGet (String url, RestTemplate restTemplate) throws ServerAnswerException {
-        ResponseEntity<SystemReply> response =
-                restTemplate.getForEntity(url, SystemReply.class);
-        return extractFromResponse(response);
+    private static final String ORDERED_REQ = "/ordered";
+    private static final String UNORDERED_REQ = "/unordered";
+
+    private final String base;
+    private final RestTemplate restTemplate;
+
+    public ExtractAnswer(String base, RestTemplate restTemplate) {
+        this.base = base;
+        this.restTemplate = restTemplate;
     }
 
-    public <V> String extractAnswerPost (String url, V objPost,RestTemplate restTemplate) throws ServerAnswerException {
+    private static String makeOrderedUrl(String base) {
+        return String.format("%s%s", base, ORDERED_REQ);
+    }
+
+    private static String makeUnorderedUrl(String base) {
+        return String.format("%s%s", base, UNORDERED_REQ);
+    }
+
+    private static String makePostJson(String path, String json) {
+        return String.format("%s\n%s", path, json);
+    }
+
+    public String extractOrderedAnswer(String path, String postJson) throws ServerAnswerException {
+        return extractAnswer(base + ORDERED_REQ, postJson);
+    }
+
+    public String extractUnorderedAnswer(String path, String postJson) throws ServerAnswerException {
+        return extractAnswer(base + UNORDERED_REQ, postJson);
+    }
+
+    private String extractAnswer(String url, String objPost) throws ServerAnswerException {
         ResponseEntity<SystemReply> response =
                 restTemplate.postForEntity(url, objPost, SystemReply.class);
-        return extractFromResponse(response);
-    }
-
-    public String extractAnswerPut (String url,RestTemplate restTemplate) throws ServerAnswerException {
-        ResponseEntity<SystemReply> response =
-                restTemplate.exchange(url, HttpMethod.PUT, null, SystemReply.class);
-        return extractFromResponse(response);
-    }
-
-    private String extractFromResponse (ResponseEntity<SystemReply> response) throws ServerAnswerException {
         SystemReply systemReply = response.getBody();
         assert systemReply != null;
         try {

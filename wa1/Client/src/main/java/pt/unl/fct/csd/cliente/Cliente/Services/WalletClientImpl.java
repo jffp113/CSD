@@ -6,13 +6,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
-import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import pt.unl.fct.csd.cliente.Cliente.Handlers.RestTemplateHeaderModifierInterceptor;
 import pt.unl.fct.csd.cliente.Cliente.Handlers.RestTemplateResponseErrorHandler;
-import pt.unl.fct.csd.cliente.Cliente.Model.Auction;
 import pt.unl.fct.csd.cliente.Cliente.Model.Transaction;
 import pt.unl.fct.csd.cliente.Cliente.exceptions.ServerAnswerException;
 
@@ -20,6 +18,8 @@ import javax.annotation.PostConstruct;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+
+import static pt.unl.fct.csd.cliente.Cliente.Services.Path.*;
 
 @Service
 @PropertySource("classpath:application.properties")
@@ -31,13 +31,11 @@ public class WalletClientImpl implements WalletClient {
     @Value("${token}")
     private String token;
 
-    private static String WALLET_CONTROLLER =  "/money";
-    private static String CREATE_MONEY = WALLET_CONTROLLER + "/create";
-    private static String TRANSFER_MONEY = WALLET_CONTROLLER + "/transfer";
-    private static String GET_MONEY = WALLET_CONTROLLER + "/current/";
-    private static String GET_LEDGER =WALLET_CONTROLLER + "/ledger/";
+    private final Gson g = new Gson();
 
     private RestTemplate restTemplate;
+
+    private ExtractAnswer extractor;
 
     static {
         //For localhost testing only
@@ -52,8 +50,6 @@ public class WalletClientImpl implements WalletClient {
         restTemplate = restTemplateBuilder
                 .errorHandler(new RestTemplateResponseErrorHandler())
                 .build();
-
-
     }
 
     @PostConstruct
@@ -63,36 +59,44 @@ public class WalletClientImpl implements WalletClient {
         restTemplate.setInterceptors(list);
     }
 
+    private ExtractAnswer getExtractor() {
+        if (extractor == null)
+            extractor = new ExtractAnswer(BASE, restTemplate);
+        return extractor;
+    }
+
     @Override
     public void createMoney(String toUser, Long amount) throws ServerAnswerException {
-        Transaction transaction = new Transaction(toUser,amount);
-        new ExtractAnswer().extractAnswerPost(BASE + CREATE_MONEY, transaction, restTemplate);
+        String transaction = g.toJson(new Transaction(toUser,amount));
+        getExtractor().extractOrderedAnswer(CREATE_MONEY.name(), transaction);
     }
 
     @Override
     public void transferMoney(String fromUser, String toUser, Long amount) throws ServerAnswerException {
-        Transaction transaction = new Transaction(fromUser,toUser,amount);
-        new ExtractAnswer().extractAnswerPost(BASE + TRANSFER_MONEY, transaction, restTemplate);
+        String transaction = g.toJson(new Transaction(fromUser,toUser,amount));
+        getExtractor().extractOrderedAnswer(TRANSFER_MONEY.name(), transaction);
     }
 
     @Override
     public Long currentAmount(String userID) throws ServerAnswerException{
-        String longJson = new ExtractAnswer().extractAnswerGet(BASE + GET_MONEY, restTemplate);
+        String uid = String.format("{ \"userId\": \"%s\"}", userID);
+        String longJson = getExtractor().extractUnorderedAnswer(GET_MONEY.name(), uid);
         return Long.valueOf(longJson);
     }
 
     @Override
     public List<Transaction> ledgerOfGlobalTransfers() throws ServerAnswerException{
-        return getLedgerFromPath(BASE + GET_LEDGER);
+        return getLedgerFromPath(GET_LEDGER.name(), "");
     }
 
     @Override
     public List<Transaction> LedgerOfClientTransfers(String userId) throws ServerAnswerException {
-        return getLedgerFromPath(BASE + GET_LEDGER + userId);
+        String uid = String.format("{\"userId\": \"%s\"}", userId);
+        return getLedgerFromPath(GET_CLIENT_LEDGER.name(), uid);
     }
 
-    private List<Transaction> getLedgerFromPath(String path) throws ServerAnswerException {
-        String transactionsJson = new ExtractAnswer().extractAnswerGet(path, restTemplate);
+    private List<Transaction> getLedgerFromPath(String path, String post) throws ServerAnswerException {
+        String transactionsJson = getExtractor().extractUnorderedAnswer(path, post);
         return Arrays.asList(new Gson().fromJson(transactionsJson, Transaction[].class));
     }
 
