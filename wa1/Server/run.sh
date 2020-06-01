@@ -31,10 +31,6 @@ function startService() {
       #rm -rf "$(pwd)/Database/db${i}"
       docker run --rm -d --network=csd -v "$(pwd)/Database/db${i}":/var/lib/mysql -e MYSQL_ROOT_PASSWORD=toor --name "db${i}" csddatabase
     done
-    echo "Service Database Started"
-
-    echo "Waiting 1 minute before starting replicas"
-    sleep 60
     echo "Starting replicas"
 
 
@@ -77,9 +73,6 @@ function clearDatabase() {
 
 function buildService() {
   mvn clean package --settings settings.xml -DskipTests
-  cd Database
-  docker build -t csddatabase .
-  cd ..
 }
 
 if (! docker stats --no-stream); then
