@@ -19,7 +19,7 @@ public class ServerControllerImp implements ServerController {
 
     @Override
     public SystemReply orderedOperation(byte[] val) {
-        logger.info("Proxy received OrderedOperation");
+        logger.info("Proxy received OrderedOperation\n" + new String(val));
         return clientAsyncReplicator.invokeOrderedReplication(val);
     }
 
