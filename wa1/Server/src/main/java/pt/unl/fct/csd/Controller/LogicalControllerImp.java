@@ -27,7 +27,7 @@ public class LogicalControllerImp implements LogicalController {
 
     @Override
     public byte[] CallOperation(byte[] val) {
-        logger.info("Call Operation " + Arrays.hashCode(val));
+        logger.info("Call Operation \n" + new String(val));
         try (Socket socket = new Socket(address, port);
              DataOutputStream out = new DataOutputStream(socket.getOutputStream());
              DataInputStream in = new DataInputStream(socket.getInputStream())) {
