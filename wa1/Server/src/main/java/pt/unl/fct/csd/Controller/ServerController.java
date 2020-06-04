@@ -4,6 +4,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import pt.unl.fct.csd.Model.SystemReply;
 
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_OCTET_STREAM_VALUE;
 
 public interface ServerController {
@@ -12,10 +13,10 @@ public interface ServerController {
     String UNORDERED_URL = "/unordered";
 
     @PostMapping(value = ORDERED_URL,
-            produces = APPLICATION_OCTET_STREAM_VALUE)
+            produces = APPLICATION_JSON_VALUE)
     SystemReply orderedOperation(@RequestBody byte[] val);
 
     @PostMapping(value = UNORDERED_URL,
-            produces = APPLICATION_OCTET_STREAM_VALUE)
+            produces = APPLICATION_JSON_VALUE)
     SystemReply unorderedOperation(@RequestBody byte[] val);
 }
