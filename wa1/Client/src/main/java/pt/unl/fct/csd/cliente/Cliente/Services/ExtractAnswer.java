@@ -43,7 +43,7 @@ public class ExtractAnswer {
 
     private String extractAnswer(String url, String objPost) throws ServerAnswerException {
         ResponseEntity<SystemReply> response =
-                restTemplate.postForEntity(url, objPost, SystemReply.class);
+                restTemplate.postForEntity(url, objPost.getBytes(), SystemReply.class);
         SystemReply systemReply = response.getBody();
         assert systemReply != null;
         try {
