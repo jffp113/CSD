@@ -28,7 +28,7 @@ public class LogicalControllerImp implements LogicalController {
 
         } catch (Exception e) {
             e.printStackTrace();
-            return null;
+            return new byte[0];
         }
     }
 }
