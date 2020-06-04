@@ -34,14 +34,16 @@ public class ExtractAnswer {
     }
 
     public String extractOrderedAnswer(String path, String postJson) throws ServerAnswerException {
-        return extractAnswer(base + ORDERED_REQ, postJson);
+        return extractAnswer(base + ORDERED_REQ, path, postJson);
     }
 
     public String extractUnorderedAnswer(String path, String postJson) throws ServerAnswerException {
-        return extractAnswer(base + UNORDERED_REQ, postJson);
+        return extractAnswer(base + UNORDERED_REQ, path, postJson);
     }
 
-    private String extractAnswer(String url, String objPost) throws ServerAnswerException {
+    private String extractAnswer(String url, String path, String postJson) throws ServerAnswerException {
+        String objPost = String.format("%s\n%s", path, postJson);
+        System.out.println(objPost);
         ResponseEntity<SystemReply> response =
                 restTemplate.postForEntity(url, objPost.getBytes(), SystemReply.class);
         SystemReply systemReply = response.getBody();

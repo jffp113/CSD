@@ -71,14 +71,14 @@ public class AuctionClientImpl implements AuctionClient {
 
 	@Override
 	public Long createAuction(String ownerId) throws ServerAnswerException {
-		String uid = String.format("{ \"ownerId\": \"%s\"}", ownerId);
+		String uid = String.format("{\"ownerId\":\"%s\"}", ownerId);
 		String longJson = getExtractor().extractOrderedAnswer(CREATE_AUCTION.name(), uid);
 		return Long.valueOf(longJson);
     }
 
 	@Override
 	public void terminateAuction(long auctionId) throws ServerAnswerException {
-    	String id = String.format("{ \"auctionId\": \"%d\"}", auctionId);
+    	String id = String.format("{\"auctionId\":\"%d\"}", auctionId);
 		getExtractor().extractOrderedAnswer(TERMINATE_AUCTION.name(), id);
 	}
 
@@ -96,21 +96,21 @@ public class AuctionClientImpl implements AuctionClient {
 
 	@Override
 	public List<Bid> getAuctionBids(long auctionId) throws ServerAnswerException {
-		String id = String.format("{ \"auctionId\": \"%d\"}", auctionId);
+		String id = String.format("{\"auctionId\":\"%d\"}", auctionId);
 		String bidsJson = getExtractor().extractUnorderedAnswer(GET_AUCTION_BIDS.name(), id);
 		return Arrays.asList(new Gson().fromJson(bidsJson, Bid[].class));
 	}
 
 	@Override
 	public List<Bid> getClientBids(String clientId) throws ServerAnswerException {
-		String id = String.format("{ \"clientId\": \"%s\"}", clientId);
+		String id = String.format("{\"clientId\":\"%s\"}", clientId);
 		String bidsJson = getExtractor().extractUnorderedAnswer(GET_CLIENT_BIDS.name(), id);
 		return Arrays.asList(new Gson().fromJson(bidsJson, Bid[].class));
 	}
 
 	@Override
 	public Bid getClosedBid(long auctionId) throws ServerAnswerException {
-		String id = String.format("{ \"auctionId\": \"%d\"}", auctionId);
+		String id = String.format("{\"auctionId\":\"%d\"}", auctionId);
 		String bidJson = getExtractor().extractUnorderedAnswer(GET_CLOSE_BID.name(), id);
 		return new Gson().fromJson(bidJson, Bid.class);
 	}

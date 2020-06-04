@@ -87,7 +87,7 @@ public class WalletClientImpl implements WalletClient {
 
     @Override
     public Long currentAmount(String userID) throws ServerAnswerException{
-        String uid = String.format("{ \"userId\": \"%s\"}", userID);
+        String uid = String.format("{\"userId\":\"%s\"}", userID);
         String longJson = getExtractor().extractUnorderedAnswer(GET_MONEY.name(), uid);
         return Long.valueOf(longJson);
     }
@@ -99,7 +99,7 @@ public class WalletClientImpl implements WalletClient {
 
     @Override
     public List<Transaction> LedgerOfClientTransfers(String userId) throws ServerAnswerException {
-        String uid = String.format("{\"userId\": \"%s\"}", userId);
+        String uid = String.format("{\"userId\":\"%s\"}", userId);
         return getLedgerFromPath(GET_CLIENT_LEDGER.name(), uid);
     }
 
