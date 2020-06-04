@@ -11,6 +11,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.net.Socket;
 import java.util.Arrays;
+import java.util.Base64;
 
 @PropertySource("classpath:application.properties")
 @Service("LogicalEndpoint")
@@ -32,6 +33,7 @@ public class LogicalControllerImp implements LogicalController {
              DataOutputStream out = new DataOutputStream(socket.getOutputStream());
              DataInputStream in = new DataInputStream(socket.getInputStream())) {
             out.write(val);
+
             return in.readAllBytes();
 
         } catch (Exception e) {

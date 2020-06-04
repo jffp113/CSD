@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.RestController;
 import pt.unl.fct.csd.Model.SystemReply;
 import pt.unl.fct.csd.Replication.ClientAsyncReplicator;
 
+import java.util.Base64;
+
 @RestController("ServerEndpoint")
 @RequestMapping(value = ServerController.BASE_URL)
 public class ServerControllerImp implements ServerController {
@@ -19,13 +21,17 @@ public class ServerControllerImp implements ServerController {
 
     @Override
     public SystemReply orderedOperation(byte[] val) {
-        logger.info("Proxy received OrderedOperation\n" + new String(val));
-        return clientAsyncReplicator.invokeOrderedReplication(val);
+        logger.info("Proxy received OrderedOperation");
+        return clientAsyncReplicator.
+                invokeOrderedReplication( Base64.getDecoder().decode(val));
     }
 
     @Override
     public SystemReply unorderedOperation(byte[] val) {
         logger.info("Proxy received UnorderedOperation");
-        return clientAsyncReplicator.invokeUnorderedReplication(val);
+        return clientAsyncReplicator.
+                invokeUnorderedReplication(
+                        Base64.getDecoder().decode(val)
+                );
     }
 }
