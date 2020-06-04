@@ -1,12 +1,17 @@
 package pt.unl.fct.csd.cliente.Cliente.Services;
 
 import com.google.gson.Gson;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 import pt.unl.fct.csd.cliente.Cliente.Model.InvokerWrapper;
 import pt.unl.fct.csd.cliente.Cliente.Model.SystemReply;
 import pt.unl.fct.csd.cliente.Cliente.exceptions.NoMajorityAnswerException;
 import pt.unl.fct.csd.cliente.Cliente.exceptions.ServerAnswerException;
+
+import static org.springframework.http.MediaType.APPLICATION_OCTET_STREAM_VALUE;
 
 public class ExtractAnswer {
 
@@ -46,6 +51,7 @@ public class ExtractAnswer {
         System.out.println(objPost);
         ResponseEntity<SystemReply> response =
                 restTemplate.postForEntity(url, objPost.getBytes(), SystemReply.class);
+
         SystemReply systemReply = response.getBody();
         assert systemReply != null;
         try {
