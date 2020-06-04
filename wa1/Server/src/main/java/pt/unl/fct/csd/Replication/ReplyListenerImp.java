@@ -18,7 +18,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static java.util.Collections.synchronizedCollection;
 
-public class ReplyListenerImp <E> implements ReplyListener {
+public class ReplyListenerImp<E> implements ReplyListener {
 
     private final Logger logger =
             LoggerFactory.getLogger(ClientAsyncReplicator.class);
@@ -45,7 +45,7 @@ public class ReplyListenerImp <E> implements ReplyListener {
         if (msg.getSender() == asyncSP.getProcessId())
             receivedFromThisReplica = true;
 
-        if(hasValidQuorum())
+        if (hasValidQuorum())
             deliverReply(requestContext);
     }
 

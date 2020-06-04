@@ -3,7 +3,6 @@ package pt.unl.fct.csd.Model;
 public class ReplicaSignature {
 
     private int replicaNumber;
-
     private byte[] signature;
 
     public ReplicaSignature(int replicaNumber, byte[] signature) {
@@ -11,7 +10,8 @@ public class ReplicaSignature {
         this.signature = signature;
     }
 
-    public ReplicaSignature() {}
+    public ReplicaSignature() {
+    }
 
     public void setReplicaNumber(int replicaNumber) {
         this.replicaNumber = replicaNumber;
