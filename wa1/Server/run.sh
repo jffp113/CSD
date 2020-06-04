@@ -28,7 +28,7 @@ function startService() {
     echo "Service Database Starting"
     for (( i=1; i<=(($1 + $2)); i++ ))
     do
-      docker run -ti --network=csd --rm --name "db${i}"  mongo --bind_ip 0.0.0.0
+      docker run -d --network=csd --rm --name "db${i}"  mongo --bind_ip 0.0.0.0
     done
 
     echo "Starting replicas"
@@ -41,7 +41,7 @@ function startService() {
        -e "REPLICA_ID=${REPLICA_ID}"  -e "SERVER_PORT=${SERVER_PORT}" -e "LOGIC_ADDRESS=go${i}" -e "LOGIC_PORT=4678" --name "replica${i}" server
 
 
-       docker run --rm -d --device=/dev/isgx -p 4678:4678 -e SCONE_VERSION=1 -e SCONE_HEAP=2G -e SCONE_LOG=7 --name "go${i}" goserver
+       docker run --rm -d --device=/dev/isgx --network=csd -e SCONE_VERSION=1 -e SCONE_HEAP=2G -e SCONE_LOG=7 --name "go${i}" goserver
 
       ((REPLICA_ID++))
       ((END_IP++))
