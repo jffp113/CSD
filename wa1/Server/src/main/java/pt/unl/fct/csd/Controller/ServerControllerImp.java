@@ -31,7 +31,7 @@ public class ServerControllerImp implements ServerController {
         logger.info("Proxy received UnorderedOperation");
         return clientAsyncReplicator.
                 invokeUnorderedReplication(
-                        Base64.getDecoder().decode(val)
+                        Base64.getMimeDecoder().decode(val)
                 );
     }
 }
