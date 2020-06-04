@@ -40,8 +40,7 @@ function startService() {
       docker run --rm -d --network=csd -p $((SERVER_PORT + i)):${SERVER_PORT}  -e MYSQL_HOST="db${i}" \
        -e "REPLICA_ID=${REPLICA_ID}"  -e "SERVER_PORT=${SERVER_PORT}" -e "LOGIC_ADDRESS=go${i}" -e "LOGIC_PORT=4678" --name "replica${i}" server
 
-
-       docker run --rm -d --device=/dev/isgx --network=csd -e SCONE_VERSION=1 -e SCONE_HEAP=2G -e SCONE_LOG=7 --name "go${i}" goserver
+       docker run --rm -d --device=/dev/isgx --network=csd -e BD="db${i}" -e SCONE_VERSION=1 -e SCONE_HEAP=2G -e SCONE_LOG=7 --name "go${i}" goserver
 
       ((REPLICA_ID++))
       ((END_IP++))
