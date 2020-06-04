@@ -11,6 +11,8 @@ import pt.unl.fct.csd.cliente.Cliente.Model.SystemReply;
 import pt.unl.fct.csd.cliente.Cliente.exceptions.NoMajorityAnswerException;
 import pt.unl.fct.csd.cliente.Cliente.exceptions.ServerAnswerException;
 
+import java.nio.charset.StandardCharsets;
+
 import static org.springframework.http.MediaType.APPLICATION_OCTET_STREAM_VALUE;
 
 public class ExtractAnswer {
@@ -50,7 +52,7 @@ public class ExtractAnswer {
         String objPost = String.format("%s\n%s", path, postJson);
         System.out.println(objPost);
         ResponseEntity<SystemReply> response =
-                restTemplate.postForEntity(url, objPost.getBytes(), SystemReply.class);
+                restTemplate.postForEntity(url, objPost.getBytes(StandardCharsets.UTF_8), SystemReply.class);
 
         SystemReply systemReply = response.getBody();
         assert systemReply != null;
