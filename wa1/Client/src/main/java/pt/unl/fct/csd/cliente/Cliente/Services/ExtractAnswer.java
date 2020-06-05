@@ -11,7 +11,9 @@ import pt.unl.fct.csd.cliente.Cliente.Model.SystemReply;
 import pt.unl.fct.csd.cliente.Cliente.exceptions.NoMajorityAnswerException;
 import pt.unl.fct.csd.cliente.Cliente.exceptions.ServerAnswerException;
 
+import java.lang.reflect.Array;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 
 import static org.springframework.http.MediaType.APPLICATION_OCTET_STREAM_VALUE;
 
@@ -66,6 +68,11 @@ public class ExtractAnswer {
     }
 
     private InvokerWrapper convertMostFrequentAnswer(byte[] answer) {
-        return new Gson().fromJson(new String(answer), InvokerWrapper.class);
+        byte[] result = Arrays.copyOfRange(answer,1,answer.length);
+        String resultAsString = new String(result);
+        if(answer[0] == 0){
+            return InvokerWrapper.newInvokeWrapperResult(resultAsString);
+        }
+        return InvokerWrapper.newInvokeWrapperException(resultAsString);
     }
 }
