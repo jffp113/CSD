@@ -1,13 +1,19 @@
 package pt.unl.fct.csd.cliente.Cliente.Model;
 
+import com.google.gson.annotations.SerializedName;
+
 public class Bid {
 
+	@SerializedName(value = "id", alternate = {"Id"})
 	private Long id;
 
+	@SerializedName(value = "bidderId", alternate = {"BidderId"})
 	private String bidderId;
-	
+
+	@SerializedName(value = "auctionId", alternate = {"AuctionId"})
 	private Long auctionId;
 
+	@SerializedName(value = "value", alternate = {"Value"})
 	private int value;
 
 	public Bid(String bidderId, Long auctionId, int value){

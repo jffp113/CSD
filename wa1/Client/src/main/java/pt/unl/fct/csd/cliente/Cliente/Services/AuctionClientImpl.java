@@ -104,7 +104,7 @@ public class AuctionClientImpl implements AuctionClient {
 
 	@Override
 	public List<Bid> getAuctionBids(long auctionId) throws ServerAnswerException {
-		String id = String.format("{\"auctionId\":\"%d\"}", auctionId);
+		String id = String.format("{\"auctionId\": %d}", auctionId);
 		String bidsJson = getExtractor().extractUnorderedAnswer(GET_AUCTION_BIDS.name(), id);
 		return Arrays.asList(new Gson().fromJson(bidsJson, Bid[].class));
 	}
@@ -118,7 +118,7 @@ public class AuctionClientImpl implements AuctionClient {
 
 	@Override
 	public Bid getClosedBid(long auctionId) throws ServerAnswerException {
-		String id = String.format("{\"auctionId\":\"%d\"}", auctionId);
+		String id = String.format("{\"auctionId\": %d}", auctionId);
 		String bidJson = getExtractor().extractUnorderedAnswer(GET_CLOSE_BID.name(), id);
 		return new Gson().fromJson(bidJson, Bid.class);
 	}

@@ -70,7 +70,7 @@ public class ExtractAnswer {
     private InvokerWrapper convertMostFrequentAnswer(byte[] answer) {
         byte[] result = Arrays.copyOfRange(answer,1,answer.length);
         String resultAsString = new String(result);
-        if(answer[0] == 0){
+        if(answer[0] == 0 && !resultAsString.equals("null")){
             return InvokerWrapper.newInvokeWrapperResult(resultAsString);
         }
         return InvokerWrapper.newInvokeWrapperException(resultAsString);

@@ -1,13 +1,19 @@
 package pt.unl.fct.csd.cliente.Cliente.Model;
 
+import com.google.gson.annotations.SerializedName;
+
 public class Auction {
 
+	@SerializedName(value = "id", alternate = {"Id"})
 	private Long id;
 
+	@SerializedName(value = "ownerId", alternate = {"OwnerId"})
 	private String ownerId;
 
+	@SerializedName(value = "lastBidId", alternate = {"LastBidId"})
 	private String lastBidId;
-	
+
+	@SerializedName(value = "isClosed", alternate = {"IsClosed"})
 	private boolean isClosed;
 	
 	public Auction () {
