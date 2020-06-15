@@ -1,8 +1,6 @@
-# WA4
+# Final
 
-The name "wa1" does not correspond to the version of the project.
-
-Project Version **WA4**
+Project Version **Final**
 
 # WA4 What was implemented
 
@@ -16,6 +14,13 @@ Project Version **WA4**
 - Java 11+ (For compilation, not tested for Java 8 to 10)
 
 # Compile and Run project Server
+To compile the project first we need to build a image for the go component by running the following command in the go module.
+'''
+docker build . -t goserver
+'''
+
+Next you can proceed in the following commands
+
 
 There is a script that allows you to compile and build the project. You can concatenate commands:
 
