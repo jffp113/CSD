@@ -6,7 +6,6 @@ import java.util.Set;
 public class SystemReply {
 
     private byte[] reply;
-
     private Collection<ReplicaSignature> signatures;
 
     public SystemReply(byte[] reply, Collection<ReplicaSignature> signatures) {
@@ -14,7 +13,8 @@ public class SystemReply {
         this.signatures = signatures;
     }
 
-    public SystemReply() {}
+    public SystemReply() {
+    }
 
     public byte[] getReply() {
         return reply;

@@ -50,8 +50,6 @@ public class SmartContractClientImpl implements SmartContractClient {
         restTemplate = restTemplateBuilder
                 .errorHandler(new RestTemplateResponseErrorHandler())
                 .build();
-
-
     }
 
     @PostConstruct

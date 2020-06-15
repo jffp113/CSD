@@ -24,42 +24,28 @@ function startService() {
   --driver=bridge \
   --subnet=172.1.0.0/16 \
   --gateway=172.1.0.1 csd || true
-    echo "Service Containers Starting"
+  echo "Service Containers Starting"
     echo "Service Database Starting"
     for (( i=1; i<=(($1 + $2)); i++ ))
     do
-      #rm -rf "$(pwd)/Database/db${i}"
-      docker run --rm -d --network=csd -v "$(pwd)/Database/db${i}":/var/lib/mysql -e MYSQL_ROOT_PASSWORD=toor --name "db${i}" csddatabase
+      docker run -d --network=csd --rm --name "db${i}"  mongo --bind_ip 0.0.0.0
     done
-    echo "Service Database Started"
 
-    echo "Waiting 1 minute before starting replicas"
-    sleep 60
     echo "Starting replicas"
 
-
-    #No Byzantines
-    #for i in {1..$(($1))}
     for (( i=1; i<=$1; i++ ))
     do
       echo "Starting correct replica $i"
 
       docker run --rm -d --network=csd -p $((SERVER_PORT + i)):${SERVER_PORT}  -e MYSQL_HOST="db${i}" \
-       -e "REPLICA_ID=${REPLICA_ID}"  -e "SERVER_PORT=${SERVER_PORT}" -e "REPLICA_BYZ=false" --name "replica${i}" server
-      ((REPLICA_ID++))
-      ((END_IP++))
+       -e "REPLICA_ID=${REPLICA_ID}"  -e "SERVER_PORT=${SERVER_PORT}" -e "LOGIC_ADDRESS=go${i}" -e "LOGIC_PORT=4678" --name "replica${i}" server
 
-    done
+       docker run --rm -d --device=/dev/isgx --network=csd -e DB="db${i}" -e SCONE_VERSION=1 -e SCONE_HEAP=2G -e SCONE_LOG=7 --name "go${i}" goserver
 
-    #Byzantines
-    for (( i=$1 + 1; i<=$2 + $1; i++ ))
-    do
-      echo "Starting correct byzantine $(($i - $1))"
-    docker run --rm -d --network=csd -p $((SERVER_PORT + $2 + $i)):${SERVER_PORT}  -e MYSQL_HOST="db${i}" \
-       -e "REPLICA_ID=${REPLICA_ID}"  -e "SERVER_PORT=${SERVER_PORT}" -e "REPLICA_BYZ=true" --name "replica${i}" server
       ((REPLICA_ID++))
       ((END_IP++))
     done
+
     echo "Service Containers Started"
 }
 
@@ -77,9 +63,6 @@ function clearDatabase() {
 
 function buildService() {
   mvn clean package --settings settings.xml -DskipTests
-  cd Database
-  docker build -t csddatabase .
-  cd ..
 }
 
 if (! docker stats --no-stream); then

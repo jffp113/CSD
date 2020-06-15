@@ -4,40 +4,25 @@ import java.io.Serializable;
 
 public class InvokerWrapper {
 
-    private String result;
-    private Exception exception;
+    private final String result;
+    private final String exception;
 
-    private InvokerWrapper(Exception exception){
+    private InvokerWrapper(String exception, String result){
         this.exception = exception;
-        this.result = null;
-    }
-
-    private InvokerWrapper(String result){
-        this.exception = null;
         this.result = result;
     }
 
-    private InvokerWrapper() {}
-
-    public String getResult() {
-        return result;
+    public static InvokerWrapper newInvokeWrapperException(String exception){
+        return new InvokerWrapper(exception,null);
     }
 
-    public void setResult(String resultJson) {
-        this.result = resultJson;
-    }
-
-    public Exception getException() {
-        return exception;
-    }
-
-    public void setException(Exception exception) {
-        this.exception = exception;
+    public static InvokerWrapper newInvokeWrapperResult(String result){
+        return new InvokerWrapper(null,result);
     }
 
     public String getResultOrThrow() throws Exception {
         if(exception != null)
-           throw exception;
+           throw new RuntimeException(exception);
 
         return result;
     }

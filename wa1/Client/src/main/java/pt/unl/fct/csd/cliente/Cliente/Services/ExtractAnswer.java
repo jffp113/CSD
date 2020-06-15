@@ -1,6 +1,8 @@
 package pt.unl.fct.csd.cliente.Cliente.Services;
 
 import com.google.gson.Gson;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
@@ -9,27 +11,51 @@ import pt.unl.fct.csd.cliente.Cliente.Model.SystemReply;
 import pt.unl.fct.csd.cliente.Cliente.exceptions.NoMajorityAnswerException;
 import pt.unl.fct.csd.cliente.Cliente.exceptions.ServerAnswerException;
 
+import java.lang.reflect.Array;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+
+import static org.springframework.http.MediaType.APPLICATION_OCTET_STREAM_VALUE;
+
 public class ExtractAnswer {
 
-    public String extractAnswerGet (String url, RestTemplate restTemplate) throws ServerAnswerException {
-        ResponseEntity<SystemReply> response =
-                restTemplate.getForEntity(url, SystemReply.class);
-        return extractFromResponse(response);
+    private static final String ORDERED_REQ = "/ordered";
+    private static final String UNORDERED_REQ = "/unordered";
+
+    private final String base;
+    private final RestTemplate restTemplate;
+
+    public ExtractAnswer(String base, RestTemplate restTemplate) {
+        this.base = base;
+        this.restTemplate = restTemplate;
     }
 
-    public <V> String extractAnswerPost (String url, V objPost,RestTemplate restTemplate) throws ServerAnswerException {
-        ResponseEntity<SystemReply> response =
-                restTemplate.postForEntity(url, objPost, SystemReply.class);
-        return extractFromResponse(response);
+    private static String makeOrderedUrl(String base) {
+        return String.format("%s%s", base, ORDERED_REQ);
     }
 
-    public String extractAnswerPut (String url,RestTemplate restTemplate) throws ServerAnswerException {
-        ResponseEntity<SystemReply> response =
-                restTemplate.exchange(url, HttpMethod.PUT, null, SystemReply.class);
-        return extractFromResponse(response);
+    private static String makeUnorderedUrl(String base) {
+        return String.format("%s%s", base, UNORDERED_REQ);
     }
 
-    private String extractFromResponse (ResponseEntity<SystemReply> response) throws ServerAnswerException {
+    private static String makePostJson(String path, String json) {
+        return String.format("%s\n%s", path, json);
+    }
+
+    public String extractOrderedAnswer(String path, String postJson) throws ServerAnswerException {
+        return extractAnswer(base + ORDERED_REQ, path, postJson);
+    }
+
+    public String extractUnorderedAnswer(String path, String postJson) throws ServerAnswerException {
+        return extractAnswer(base + UNORDERED_REQ, path, postJson);
+    }
+
+    private String extractAnswer(String url, String path, String postJson) throws ServerAnswerException {
+        String objPost = String.format("%s\n%s", path, postJson);
+        System.out.println(objPost);
+        ResponseEntity<SystemReply> response =
+                restTemplate.postForEntity(url, objPost.getBytes(StandardCharsets.UTF_8), SystemReply.class);
+
         SystemReply systemReply = response.getBody();
         assert systemReply != null;
         try {
@@ -42,6 +68,11 @@ public class ExtractAnswer {
     }
 
     private InvokerWrapper convertMostFrequentAnswer(byte[] answer) {
-        return new Gson().fromJson(new String(answer), InvokerWrapper.class);
+        byte[] result = Arrays.copyOfRange(answer,1,answer.length);
+        String resultAsString = new String(result);
+        if(answer[0] == 0 && !resultAsString.equals("null")){
+            return InvokerWrapper.newInvokeWrapperResult(resultAsString);
+        }
+        return InvokerWrapper.newInvokeWrapperException(resultAsString);
     }
 }

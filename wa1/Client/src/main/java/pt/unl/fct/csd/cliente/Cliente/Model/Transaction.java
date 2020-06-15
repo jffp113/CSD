@@ -1,6 +1,8 @@
 package pt.unl.fct.csd.cliente.Cliente.Model;
 
 
+import com.google.gson.annotations.SerializedName;
+
 public class Transaction {
 
     public Transaction(){}
@@ -15,12 +17,16 @@ public class Transaction {
        this.from = fromUser;
     }
 
+    @SerializedName(value = "id", alternate = {"Id"})
     private Long id;
 
+    @SerializedName(value = "from", alternate = {"From"})
     private String from;
 
+    @SerializedName(value = "to", alternate = {"To"})
     private String to;
 
+    @SerializedName(value = "amount", alternate = {"Amount"})
     private Long amount;
 
     public Long getId() {
